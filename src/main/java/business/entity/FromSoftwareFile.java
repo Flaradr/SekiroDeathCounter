@@ -2,7 +2,7 @@ package business.entity;
 
 public abstract interface FromSoftwareFile {
 
-    public void displayFirstSaveSlotInfo();
+    public String stringifyFirstSaveSlotInfo();
 
-    public void displayNthSaveSlotInfo(int index);
+    public String stringifyNthSaveSlotInfo(int index);
 }
