@@ -4,15 +4,20 @@ import business.entity.EldenRingFile;
 import business.entity.FromSoftwareFile;
 import business.entity.FromSoftwareGames;
 import business.entity.SekiroFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 
 //Source : https://www.guru99.com/fr/java-swing-gui.html?utm_campaign=click&utm_medium=referral&utm_source=relatedarticles
 public class GraphicUserInterface {
+    private static Logger LOGGER = LogManager.getLogger(GraphicUserInterface.class);
 
     private static final int DEFAULT_WIDTH = 600;
     private static final int DEFAULT_HEIGHT = 600;
@@ -23,8 +28,12 @@ public class GraphicUserInterface {
     private static FromSoftwareGames chosenGame;
     private static Path chosenGamePath;
     private static JLabel chosenGameLabel = new JLabel("Pas de fichier chargé");
+    private static JFrame errorFrame = new JFrame("Erreur");
+
 
     public static void openGui() {
+        initializeErrorPopup();
+
         //Creating the frame
         JFrame frame = new JFrame(APPLICATION_TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,7 +65,7 @@ public class GraphicUserInterface {
         //Bottom panel to upload file
         JPanel uploadFilePanel = new JPanel();
         JButton uploadButton = new JButton("Choisir un fichier de sauvegarde");
-        addImportFileListener(uploadButton, gameInformationLabel);
+        importFileListener(uploadButton, gameInformationLabel);
         uploadFilePanel.setLayout(new BorderLayout());
         uploadFilePanel.add(uploadButton, BorderLayout.WEST);
         uploadFilePanel.add(chosenGameLabel, BorderLayout.EAST);
@@ -70,14 +79,20 @@ public class GraphicUserInterface {
         frame.setVisible(true);
     }
 
-    private static void addImportFileListener(JButton uploadButton, JLabel gameInformationLabel) {
+    private static void importFileListener(JButton uploadButton, JLabel gameInformationLabel) {
         uploadButton.addActionListener(actionListener -> {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             int jFileChooserOpenedState = fileChooser.showOpenDialog(null);
             if (jFileChooserOpenedState == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 chosenGamePath = Path.of(selectedFile.getAbsolutePath());
-                updateGameInfo(gameInformationLabel);
+                try {
+                    updateGameInfo(gameInformationLabel);
+                } catch (NumberFormatException e) {
+                    String errorMessage = "Erreur lors de la lecture du fichier, vérifiez que le jeu sélectionné correspond bien au fichier choisi";
+                    displayError(errorMessage);
+                    LOGGER.error(errorMessage, e);
+                }
                 chosenGameLabel.setText("Fichier chargé : " + chosenGamePath.getFileName().toString());
                 chosenGameLabel.setVisible(true);
             }
@@ -90,6 +105,29 @@ public class GraphicUserInterface {
             case ELDEN_RING -> saveFile = new EldenRingFile(chosenGamePath);
             case SEKIRO -> saveFile = new SekiroFile(chosenGamePath);
         }
-        gameInformationLabel.setText(saveFile.stringifyFirstSaveSlotInfo());
+        if (null != saveFile) {
+            gameInformationLabel.setText(saveFile.stringifyFirstSaveSlotInfo());
+        } else {
+            gameInformationLabel.setText("Solution pas encore développée pour : " + chosenGame.getFullName());
+        }
+    }
+
+    private static void initializeErrorPopup() {
+        errorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        errorFrame.setSize(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2);
+        errorFrame.setVisible(false);
+    }
+
+    private static void displayError(String errorMessage) {
+        JTextPane jTextPane = new JTextPane();
+        jTextPane.setEditable(false);
+        StyledDocument sDoc = (StyledDocument) jTextPane.getDocument();
+        try {
+            sDoc.insertString(0, errorMessage, jTextPane.getStyle("default"));
+        } catch (BadLocationException e) {
+            LOGGER.error("Invalid position given");
+        }
+        errorFrame.add(jTextPane);
+        errorFrame.setVisible(true);
     }
 }
