@@ -39,9 +39,7 @@ public class GraphicUserInterface {
         final ButtonGroup gameSelectionButtons = new ButtonGroup();
         for (FromSoftwareGames game : FromSoftwareGames.values()) {
             AbstractButton jButton = new JRadioButton(game.getFullName());
-            jButton.addActionListener(actionListener -> {
-                chosenGame = game;
-            });
+            jButton.addActionListener(actionListener -> chosenGame = game);
             gameSelectionPanel.add(jButton);
             gameSelectionButtons.add(jButton);
         }
