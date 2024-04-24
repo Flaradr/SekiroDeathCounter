@@ -1,8 +1,8 @@
 package business.entity;
 
-public abstract interface FromSoftwareFile {
+public interface FromSoftwareFile {
 
-    public void displayFirstSaveSlotInfo();
+    String stringifyFirstSaveSlotInfo();
 
-    public void displayNthSaveSlotInfo(int index);
+    String stringifyNthSaveSlotInfo(int index);
 }

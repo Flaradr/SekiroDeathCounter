@@ -58,5 +58,14 @@ public abstract class FromSoftwareCharacter {
         return str;
     }
 
+    public String stringifiesToHtml() {
+        return "<html>\n" +
+                "<ul>\n" +
+                "<li>Nom : " + characterName + "</font>\n" +
+                "<li>Nombre de mort : <font color=red>" + deathCount + "</font>\n" +
+                "<li>Niveau : <font color=green>" + characterLevel + "</font>\n" +
+                "</ul>\n" +
+                "</html>";
+    }
 
 }

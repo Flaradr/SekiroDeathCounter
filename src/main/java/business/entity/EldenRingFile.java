@@ -30,20 +30,20 @@ public class EldenRingFile implements FromSoftwareFile {
 
     private List<EldenRingCharacter> characters;
 
-    public EldenRingFile(Path parentPath) {
-        saveFilePath = Path.of(parentPath.toString(), SAVE_FILE_NAME);
+    public EldenRingFile(Path path) {
+        saveFilePath = path;
         characters = new ArrayList<>();
     }
 
-    public void displayFirstSaveSlotInfo() {
-        displayNthSaveSlotInfo(0);
+    public String stringifyFirstSaveSlotInfo() {
+        return stringifyNthSaveSlotInfo(0);
     }
 
-    public void displayNthSaveSlotInfo(int saveSlotIndex) {
+    public String stringifyNthSaveSlotInfo(int saveSlotIndex) {
         EldenRingCharacter character = new EldenRingCharacter();
-        character.setSlotIndex(0);
-        character.setCharacterName(hexToAscii(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX, CHAR_NAME_LENGTH))));
-        character.setCharacterLevel(hexadecimalToIntLittleEndian(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + CHAR_LEVEL_LOCATION, 2))));
+        character.setSlotIndex(saveSlotIndex);
+        character.setCharacterName(hexToAscii(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + (saveSlotIndex * SAVE_SLOT_HEADER_LENGTH), CHAR_NAME_LENGTH))));
+        character.setCharacterLevel(hexadecimalToIntLittleEndian(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + CHAR_LEVEL_LOCATION + (saveSlotIndex * SAVE_SLOT_HEADER_LENGTH), 2))));
 
         byte[] bytes = readNBytesFromStreamWithOffset(saveFilePath.toString(),
                 OFFSET_DEATH_COUNTER,
@@ -51,26 +51,7 @@ public class EldenRingFile implements FromSoftwareFile {
         int numberOfDeath = hexadecimalToIntLittleEndian(bytesToHexadecimal(bytes));
         character.setDeathCount(numberOfDeath);
 
-        System.out.println(character);
         characters.add(new EldenRingCharacter());
-    }
-
-    public void getCharactersInfo() {
-        for (int index = 0; index < 9; index++) {
-            EldenRingCharacter character = new EldenRingCharacter();
-            character.setSlotIndex(index);
-            character.setCharacterName(hexToAscii(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + (index * SAVE_SLOT_HEADER_LENGTH), CHAR_NAME_LENGTH))));
-            character.setCharacterLevel(hexadecimalToIntLittleEndian(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + (index * SAVE_SLOT_HEADER_LENGTH) + CHAR_LEVEL_LOCATION, 2))));
-
-            byte[] bytes = readNBytesFromStreamWithOffset(saveFilePath.toString(),
-                    OFFSET_DEATH_COUNTER,
-                    CHAR_DEATH_LENGTH);
-            int numberOfDeath = hexadecimalToIntLittleEndian(bytesToHexadecimal(bytes));
-            character.setDeathCount(numberOfDeath);
-
-            System.out.println(character);
-
-            characters.add(character);
-        }
+        return character.stringifiesToHtml();
     }
 }
