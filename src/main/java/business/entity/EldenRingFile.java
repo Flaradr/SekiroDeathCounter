@@ -12,7 +12,7 @@ public class EldenRingFile implements FromSoftwareFile {
 
     private static final String SAVE_FILE_NAME = "ER0000.sl2";
     private static final FromSoftwareGames GAME_NAME = ELDEN_RING;
-    private final static int OFFSET_DEATH_COUNTER = 0x3874F; // Offset to access death counter of first save
+    private final static int OFFSET_DEATH_COUNTER = 0x383EC; // Offset to access death counter of first save
 
     public static final int SLOT_START_INDEX = 0x310;
     public static final int SLOT_LENGTH = 0x280000;
@@ -44,9 +44,10 @@ public class EldenRingFile implements FromSoftwareFile {
         character.setSlotIndex(saveSlotIndex);
         character.setCharacterName(hexToAscii(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + (saveSlotIndex * SAVE_SLOT_HEADER_LENGTH), CHAR_NAME_LENGTH))));
         character.setCharacterLevel(hexadecimalToIntLittleEndian(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + CHAR_LEVEL_LOCATION + (saveSlotIndex * SAVE_SLOT_HEADER_LENGTH), 2))));
+        character.setSecondsPlayed(hexadecimalToIntLittleEndian(bytesToHexadecimal(readNBytesFromStreamWithOffset(saveFilePath.toString(), SAVE_HEADER_START_INDEX + CHAR_PLAYED_START_INDEX + (saveSlotIndex * SAVE_SLOT_HEADER_LENGTH), 4))));
 
         byte[] bytes = readNBytesFromStreamWithOffset(saveFilePath.toString(),
-                OFFSET_DEATH_COUNTER,
+                OFFSET_DEATH_COUNTER + saveSlotIndex * SLOT_LENGTH,
                 CHAR_DEATH_LENGTH);
         int numberOfDeath = hexadecimalToIntLittleEndian(bytesToHexadecimal(bytes));
         character.setDeathCount(numberOfDeath);
