@@ -4,8 +4,7 @@ import business.entity.EldenRingFile;
 import business.entity.FromSoftwareFile;
 import business.entity.FromSoftwareGames;
 import business.entity.SekiroFile;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 
 //Source : https://www.guru99.com/fr/java-swing-gui.html?utm_campaign=click&utm_medium=referral&utm_source=relatedarticles
 public class GraphicUserInterface {
-    private static Logger LOGGER = LogManager.getLogger(GraphicUserInterface.class);
 
     private static final int DEFAULT_WIDTH = 600;
     private static final int DEFAULT_HEIGHT = 600;
@@ -91,7 +89,7 @@ public class GraphicUserInterface {
                 } catch (NumberFormatException e) {
                     String errorMessage = "Erreur lors de la lecture du fichier, vérifiez que le jeu sélectionné correspond bien au fichier choisi";
                     displayError(errorMessage);
-                    LOGGER.error(errorMessage, e);
+                    System.out.println(errorMessage + e);
                 }
                 chosenGameLabel.setText("Fichier chargé : " + chosenGamePath.getFileName().toString());
                 chosenGameLabel.setVisible(true);
@@ -125,7 +123,7 @@ public class GraphicUserInterface {
         try {
             sDoc.insertString(0, errorMessage, jTextPane.getStyle("default"));
         } catch (BadLocationException e) {
-            LOGGER.error("Invalid position given");
+            System.out.println("Invalid position given");
         }
         errorFrame.add(jTextPane);
         errorFrame.setVisible(true);
