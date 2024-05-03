@@ -8,6 +8,8 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/uiDesigner.xml
+
 *.iws
 *.iml
 *.ipr
@@ -36,3 +38,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+
+/out/*
+.artifacts/*
+/.idea/artifacts/SekiroDeathCounter_jar.xml
