@@ -23,41 +23,40 @@ public class GraphicUserInterface {
 
     private static FromSoftwareGames chosenGame;
     private static Path chosenGamePath;
-    private static JLabel chosenGameLabel = new JLabel("Pas de fichier chargé");
-    private static JFrame errorFrame = new JFrame("Erreur");
+    private static final JLabel chosenGameLabel = new JLabel("Pas de fichier chargé");
+    private static final JFrame errorFrame = new JFrame("Erreur");
 
     private static FileReaderController fileReaderController;
 
     public static void openGui() {
         initializeErrorPopup();
+        JFrame frame = initializeFrame();
 
-        //Creating the frame
-        JFrame frame = new JFrame(APPLICATION_TITLE);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+        // Panel displaying character information
+        final JLabel gameInformationLabel = new JLabel();
+        gameInformationLabel.setVisible(true);
+        JPanel informationPanel = new JPanel();
+        Border informationBorder = BorderFactory.createTitledBorder("Informations sur la sauvegarde");
+        informationPanel.setLayout(new BorderLayout());
+        informationPanel.setBorder(informationBorder);
+        informationPanel.add(gameInformationLabel, BorderLayout.NORTH);
 
         //Panel to select the game
         JPanel gameSelectionPanel = new JPanel(new GridLayout(0, 1));
         Border gameSelectionBorder = BorderFactory.createTitledBorder("Jeux");
         gameSelectionPanel.setBorder(gameSelectionBorder);
-
-        //http://www.java2s.com/Code/Java/Swing-JFC/ASelectedButton.htm
         final ButtonGroup gameSelectionButtons = new ButtonGroup();
         for (FromSoftwareGames game : FromSoftwareGames.values()) {
             AbstractButton jButton = new JRadioButton(game.getFullName());
-            jButton.addActionListener(actionListener -> chosenGame = game);
+            jButton.addActionListener(actionListener -> {
+                chosenGame = game;
+                gameInformationLabel.setText("");
+            });
             gameSelectionPanel.add(jButton);
             gameSelectionButtons.add(jButton);
         }
 
-        // Panel displaying character information
-        JPanel informationPanel = new JPanel();
-        Border informationBorder = BorderFactory.createTitledBorder("Informations sur la sauvegarde");
-        final JLabel gameInformationLabel = new JLabel();
-        gameInformationLabel.setVisible(true);
-        informationPanel.setLayout(new BorderLayout());
-        informationPanel.setBorder(informationBorder);
-        informationPanel.add(gameInformationLabel, BorderLayout.NORTH);
 
         //Bottom panel to upload file
         JPanel uploadFilePanel = new JPanel();
@@ -123,5 +122,13 @@ public class GraphicUserInterface {
         }
         errorFrame.add(jTextPane);
         errorFrame.setVisible(true);
+    }
+
+    private static JFrame initializeFrame() {
+        JFrame frame = new JFrame(APPLICATION_TITLE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+        return frame;
     }
 }
