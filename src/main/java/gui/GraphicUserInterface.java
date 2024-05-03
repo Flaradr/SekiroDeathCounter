@@ -1,10 +1,8 @@
 package gui;
 
-import business.entity.EldenRingFile;
-import business.entity.FromSoftwareFile;
-import business.entity.FromSoftwareGames;
-import business.entity.SekiroFile;
-
+import controller.FileReaderController;
+import domain.FromSoftwareGames;
+import domain.character.FromSoftwareCharacter;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -28,6 +26,7 @@ public class GraphicUserInterface {
     private static JLabel chosenGameLabel = new JLabel("Pas de fichier chargé");
     private static JFrame errorFrame = new JFrame("Erreur");
 
+    private static FileReaderController fileReaderController;
 
     public static void openGui() {
         initializeErrorPopup();
@@ -98,14 +97,11 @@ public class GraphicUserInterface {
     }
 
     private static void updateGameInfo(JLabel gameInformationLabel) {
-        FromSoftwareFile saveFile = null;
-        switch (chosenGame) {
-            case ELDEN_RING -> saveFile = new EldenRingFile(chosenGamePath);
-            case SEKIRO -> saveFile = new SekiroFile(chosenGamePath);
-        }
-        if (null != saveFile) {
-            gameInformationLabel.setText(saveFile.stringifyFirstSaveSlotInfo());
-        } else {
+        fileReaderController = new FileReaderController(chosenGame, chosenGamePath);
+        try {
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
+            gameInformationLabel.setText(fromSoftwareCharacter.toHtmlString());
+        } catch (NullPointerException exception) {
             gameInformationLabel.setText("Solution pas encore développée pour : " + chosenGame.getFullName());
         }
     }
