@@ -15,11 +15,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
-public class FileSelectionGUI {
+public class ParameterSelectionGUI {
 
-    private JPanel uploadFilePanel;
+    private JPanel parameterSelectionPanel;
+    private JPanel outputFileSelectionPanel;
+    private JPanel inputFileSelectionPanel;
+    private JButton fileOutputSelectionButton;
     private JButton uploadButton;
     private JButton startButton;
+    private JLabel outputFileLabel;
     private JLabel chosenGameLabel;
 
     private Path chosenGamePath;
@@ -36,18 +40,45 @@ public class FileSelectionGUI {
 
     private static final String DEFAULT_SAVE_PARENT_FOLDER = "APPDATA";
 
-    public FileSelectionGUI(FileInformation myFileInformation) {
+    public ParameterSelectionGUI(FileInformation myFileInformation) {
         deathCounterStatus = ProgramStatus.STOPPED;
         charFileInformation = myFileInformation;
         worker = new PausableSwingWorker();
+        outputFileLabel = new JLabel("Pas de fichier de sortie défini");
+        chosenGameLabel = new JLabel("Pas de fichier chargé");
+
         initComponents();
     }
 
     public void initComponents() {
-        uploadFilePanel = new JPanel();
-        Border uploadFile = BorderFactory.createTitledBorder("");
+        parameterSelectionPanel = new JPanel();
+        parameterSelectionPanel.setLayout(new GridLayout(3, 0));
+        outputFileSelectionPanel = new JPanel();
+        outputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        outputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder("Output"));
+        inputFileSelectionPanel = new JPanel();
+        inputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder("Input"));
 
-        uploadButton = new JButton("Choisir un fichier");
+        Border uploadFile = BorderFactory.createTitledBorder("Paramètres");
+
+        fileOutputSelectionButton = new JButton("Choisir le fichier de sortie");
+        fileOutputSelectionButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
+            if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                System.out.println("Save as file : " + fileToSave.getAbsolutePath());
+                outputFileLabel.setText(fileToSave.getAbsolutePath());
+            } else {
+                startButton.setVisible(false);
+            }
+        });
+
+        outputFileSelectionPanel.add(fileOutputSelectionButton);
+        outputFileSelectionPanel.add(outputFileLabel);
+
+
+        uploadButton = new JButton("Choisir un fichier de sauvegarde");
         uploadButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(uploadButton) == JFileChooser.APPROVE_OPTION) {
@@ -60,24 +91,25 @@ public class FileSelectionGUI {
                 startButton.setVisible(false);
             }
         });
+
+        inputFileSelectionPanel.add(uploadButton);
+        inputFileSelectionPanel.add(chosenGameLabel);
+
+
         startButton = new JButton("Démarrage du programme");
         startButton.addActionListener(actionListener -> onPressStartButton());
         startButton.setVisible(false);
 
-        chosenGameLabel = new JLabel("Pas de fichier chargé");
         chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        uploadFilePanel.setLayout(new GridLayout(0, 3));
-        uploadFilePanel.setBorder(uploadFile);
-        uploadFilePanel.add(uploadButton);
-        uploadFilePanel.add(chosenGameLabel);
-        uploadFilePanel.add(startButton);
-        uploadFilePanel.setPreferredSize(new Dimension(600, 100));
-
+        parameterSelectionPanel.setBorder(uploadFile);
+        parameterSelectionPanel.add(outputFileSelectionPanel);
+        parameterSelectionPanel.add(inputFileSelectionPanel);
+        parameterSelectionPanel.add(startButton);
     }
 
-    public JPanel getUploadFilePanel() {
-        return this.uploadFilePanel;
+    public JPanel getParameterSelectionPanel() {
+        return this.parameterSelectionPanel;
     }
 
     private void updateGameInfo() {
