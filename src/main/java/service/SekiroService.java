@@ -1,7 +1,7 @@
 package service;
 
 import domain.character.SekiroCharacter;
-import domain.file.SekiroSaveFileReader;
+import domain.filereader.SekiroSaveFileReader;
 import exception.CharacterNotFoundException;
 
 public class SekiroService implements FromSoftwareService {
