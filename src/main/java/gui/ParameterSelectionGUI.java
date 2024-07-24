@@ -3,6 +3,7 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.FileInformation;
+import util.FileWriterWrapper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ParameterSelectionGUI {
 
-    private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 30;
+    private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 5;
     private final static String INPUT_FILE_NOT_LOADED = "Pas de fichier chargé";
     private final static String OUTPUT_FILE_NOT_DEFINED = "Pas de fichier de sortie défini";
     private static final String DEFAULT_SAVE_PARENT_FOLDER = "APPDATA";
@@ -41,6 +42,7 @@ public class ParameterSelectionGUI {
     private JLabel chosenGameLabel;
 
     private Path chosenGamePath;
+    private Path deathCounterFilePath;
 
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
 
@@ -80,8 +82,9 @@ public class ParameterSelectionGUI {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                System.out.println("Save as file : " + fileToSave.getAbsolutePath());
-                outputFileLabel.setText(fileToSave.getAbsolutePath());
+                deathCounterFilePath = Path.of(fileToSave.getAbsolutePath());
+                System.out.println("Save as file : " + deathCounterFilePath);
+                outputFileLabel.setText(deathCounterFilePath.toString());
             } else {
                 startButton.setVisible(false);
             }
@@ -131,6 +134,7 @@ public class ParameterSelectionGUI {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
             charFileInformation.setStringifiedData("Number of death : " + fromSoftwareCharacter.getDeathCount());
             System.out.println(charFileInformation.getStringifiedData());
+            FileWriterWrapper.writeIntInFile(deathCounterFilePath, fromSoftwareCharacter.getDeathCount());
         } catch (NullPointerException exception) {
             charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());
         }
