@@ -17,6 +17,20 @@ import java.util.concurrent.TimeUnit;
 
 public class ParameterSelectionGUI {
 
+    private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 30;
+    private final static String INPUT_FILE_NOT_LOADED = "Pas de fichier chargé";
+    private final static String OUTPUT_FILE_NOT_DEFINED = "Pas de fichier de sortie défini";
+    private static final String DEFAULT_SAVE_PARENT_FOLDER = "APPDATA";
+    public static final String OUTPUT_FILE_BORDER_TITLE = "Informations sur le fichier en sortie";
+    public static final String INPUT_FILE_BORDER_TITLE = "Fichier de sauvegarde";
+    public static final String PARAMETERS = "Paramètres";
+    public static final String CHOOSE_OUTPUT_FILE = "Choisir le fichier de sortie";
+    public static final String CHOOSE_SAVE_FILE = "Choisir un fichier de sauvegarde";
+    public static final String LOADED_FILE_COLON = "Fichier chargé : ";
+    public static final String START_PROGRAM = "Démarrage du programme";
+    public static final String PAUSE_PROGRAM = "Pause du programme";
+    public static final String RESUME_PROGRAM = "Relance du programme";
+
     private JPanel parameterSelectionPanel;
     private JPanel outputFileSelectionPanel;
     private JPanel inputFileSelectionPanel;
@@ -38,14 +52,13 @@ public class ParameterSelectionGUI {
 
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    private static final String DEFAULT_SAVE_PARENT_FOLDER = "APPDATA";
 
     public ParameterSelectionGUI(FileInformation myFileInformation) {
         deathCounterStatus = ProgramStatus.STOPPED;
         charFileInformation = myFileInformation;
         worker = new PausableSwingWorker();
-        outputFileLabel = new JLabel("Pas de fichier de sortie défini");
-        chosenGameLabel = new JLabel("Pas de fichier chargé");
+        outputFileLabel = new JLabel(OUTPUT_FILE_NOT_DEFINED);
+        chosenGameLabel = new JLabel(INPUT_FILE_NOT_LOADED);
 
         initComponents();
     }
@@ -55,14 +68,14 @@ public class ParameterSelectionGUI {
         parameterSelectionPanel.setLayout(new GridLayout(3, 0));
         outputFileSelectionPanel = new JPanel();
         outputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        outputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder("Output"));
+        outputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(OUTPUT_FILE_BORDER_TITLE));
         inputFileSelectionPanel = new JPanel();
         inputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder("Input"));
+        inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(INPUT_FILE_BORDER_TITLE));
 
-        Border uploadFile = BorderFactory.createTitledBorder("Paramètres");
+        Border uploadFile = BorderFactory.createTitledBorder(PARAMETERS);
 
-        fileOutputSelectionButton = new JButton("Choisir le fichier de sortie");
+        fileOutputSelectionButton = new JButton(CHOOSE_OUTPUT_FILE);
         fileOutputSelectionButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
@@ -78,14 +91,14 @@ public class ParameterSelectionGUI {
         outputFileSelectionPanel.add(outputFileLabel);
 
 
-        uploadButton = new JButton("Choisir un fichier de sauvegarde");
+        uploadButton = new JButton(CHOOSE_SAVE_FILE);
         uploadButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(uploadButton) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 chosenGamePath = Path.of(selectedFile.getAbsolutePath());
                 charFileInformation.setFilePath(chosenGamePath);
-                chosenGameLabel.setText("Fichier chargé : " + chosenGamePath.getFileName().toString());
+                chosenGameLabel.setText(LOADED_FILE_COLON + chosenGamePath.getFileName().toString());
                 startButton.setVisible(true);
             } else {
                 startButton.setVisible(false);
@@ -96,7 +109,7 @@ public class ParameterSelectionGUI {
         inputFileSelectionPanel.add(chosenGameLabel);
 
 
-        startButton = new JButton("Démarrage du programme");
+        startButton = new JButton(START_PROGRAM);
         startButton.addActionListener(actionListener -> onPressStartButton());
         startButton.setVisible(false);
 
@@ -127,17 +140,17 @@ public class ParameterSelectionGUI {
         switch (deathCounterStatus) {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
-                startButton.setText("Pause du programme !");
+                startButton.setText(PAUSE_PROGRAM);
                 worker.execute();
             }
             case RUNNING -> {
                 deathCounterStatus = ProgramStatus.PAUSED;
-                startButton.setText("Relance du programme !");
+                startButton.setText(RESUME_PROGRAM);
                 worker.pause();
             }
             case PAUSED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
-                startButton.setText("Pause du programme !");
+                startButton.setText(PAUSE_PROGRAM);
                 worker.resume();
             }
         }
@@ -149,7 +162,7 @@ public class ParameterSelectionGUI {
                 updateGameInfo();
             }
         };
-        future = executorService.scheduleAtFixedRate(updateGameInfoRunnable, 0, 2, TimeUnit.SECONDS);
+        future = executorService.scheduleAtFixedRate(updateGameInfoRunnable, 0, PERIOD_BETWEEN_READING_IN_SECONDS, TimeUnit.SECONDS);
     }
 
 
