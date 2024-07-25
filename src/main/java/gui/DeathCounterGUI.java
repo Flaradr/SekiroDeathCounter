@@ -22,7 +22,7 @@ public class DeathCounterGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setVisible(true);
-        setLayout(new GridLayout(2, 2));
+        setLayout(new GridLayout(0, 1));
 
         GameUploadGUI gameUploadGUI = new GameUploadGUI(myFileInformation);
         GameInformationGUI gameInformationGUI = new GameInformationGUI(myFileInformation);

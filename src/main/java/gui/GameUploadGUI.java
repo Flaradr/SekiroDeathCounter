@@ -14,11 +14,11 @@ public class GameUploadGUI {
     }
 
     public void initComponents(FileInformation myFileInformation) {
-        gameUploadPanel = new JPanel(new GridLayout(2, 2));
+        gameUploadPanel = new JPanel(new BorderLayout());
         GameSelectionGUI gameSelectionGUI = new GameSelectionGUI(myFileInformation);
         ParameterSelectionGUI parameterSelectionGUI = new ParameterSelectionGUI(myFileInformation);
-        gameUploadPanel.add(gameSelectionGUI.getGameSelectionPanel());
-        gameUploadPanel.add(parameterSelectionGUI.getParameterSelectionPanel());
+        gameUploadPanel.add(gameSelectionGUI.getGameSelectionPanel(), BorderLayout.NORTH);
+        gameUploadPanel.add(parameterSelectionGUI.getParameterSelectionPanel(), BorderLayout.CENTER);
 
     }
 
