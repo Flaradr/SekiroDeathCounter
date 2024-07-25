@@ -85,8 +85,6 @@ public class ParameterSelectionGUI {
                 deathCounterFilePath = Path.of(fileToSave.getAbsolutePath());
                 System.out.println("Save as file : " + deathCounterFilePath);
                 outputFileLabel.setText(deathCounterFilePath.toString());
-            } else {
-                startButton.setVisible(false);
             }
         });
 
@@ -102,19 +100,18 @@ public class ParameterSelectionGUI {
                 chosenGamePath = Path.of(selectedFile.getAbsolutePath());
                 charFileInformation.setFilePath(chosenGamePath);
                 chosenGameLabel.setText(LOADED_FILE_COLON + chosenGamePath.getFileName().toString());
-                startButton.setVisible(true);
+                startButton.setEnabled(true);
             } else {
-                startButton.setVisible(false);
+                startButton.setEnabled(false);
             }
         });
 
         inputFileSelectionPanel.add(uploadButton);
         inputFileSelectionPanel.add(chosenGameLabel);
 
-
         startButton = new JButton(START_PROGRAM);
         startButton.addActionListener(actionListener -> onPressStartButton());
-        startButton.setVisible(false);
+        startButton.setEnabled(false);
 
         chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -141,6 +138,14 @@ public class ParameterSelectionGUI {
     }
 
     private void onPressStartButton() {
+        if (null == charFileInformation.getChosenGame()) {
+            startButton.setEnabled(false);
+            chosenGamePath = null;
+            chosenGameLabel.setText(INPUT_FILE_NOT_LOADED);
+            handleError("Le jeu n'a pas été sélectionné");
+            return;
+        }
+
         switch (deathCounterStatus) {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
@@ -158,6 +163,11 @@ public class ParameterSelectionGUI {
                 worker.resume();
             }
         }
+    }
+
+    private static void handleError(String errorMessage) {
+        ErrorDialog foo = new ErrorDialog(errorMessage);
+        foo.setVisible(true);
     }
 
     public void handleDeathCounter() {
