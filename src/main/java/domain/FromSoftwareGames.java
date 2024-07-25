@@ -1,8 +1,8 @@
 package domain;
 
 public enum FromSoftwareGames {
-    SEKIRO("Sekiro: Shadows Die Twice"),
-    ELDEN_RING("Elden Ring");
+    ELDEN_RING("Elden Ring"),
+    SEKIRO("Sekiro: Shadows Die Twice");
 
     private final String fullName;
 
