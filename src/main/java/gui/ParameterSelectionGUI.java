@@ -83,7 +83,6 @@ public class ParameterSelectionGUI {
             if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 deathCounterFilePath = Path.of(fileToSave.getAbsolutePath());
-                System.out.println("Save as file : " + deathCounterFilePath);
                 outputFileLabel.setText(deathCounterFilePath.toString());
             }
         });
@@ -129,8 +128,7 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            charFileInformation.setStringifiedData("Number of death : " + fromSoftwareCharacter.getDeathCount());
-            System.out.println(charFileInformation.getStringifiedData());
+            charFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
             FileWriterWrapper.writeIntInFile(deathCounterFilePath, fromSoftwareCharacter.getDeathCount());
         } catch (NullPointerException exception) {
             charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());

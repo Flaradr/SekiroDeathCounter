@@ -8,6 +8,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class GameSelectionGUI {
+    public static final String GAME_LIST_TITLE = "Liste des jeux";
     private JPanel gameSelectionPanel;
     private FromSoftwareGames chosenGame;
 
@@ -18,7 +19,7 @@ public class GameSelectionGUI {
 
     public void initComponents(FileInformation myFileInformation) {
         gameSelectionPanel = new JPanel(new GridLayout(0, 1));
-        Border gameSelectionBorder = BorderFactory.createTitledBorder("Liste des jeux");
+        Border gameSelectionBorder = BorderFactory.createTitledBorder(GAME_LIST_TITLE);
         gameSelectionPanel.setBorder(gameSelectionBorder);
         final ButtonGroup gameSelectionButtons = new ButtonGroup();
 
