@@ -2,8 +2,8 @@ package controller;
 
 import domain.FromSoftwareGames;
 import domain.character.FromSoftwareCharacter;
-import domain.file.EldenRingSaveFileReader;
-import domain.file.SekiroSaveFileReader;
+import domain.filereader.EldenRingSaveFileReader;
+import domain.filereader.SekiroSaveFileReader;
 import service.EldenRingService;
 import service.FromSoftwareService;
 import service.SekiroService;
@@ -17,7 +17,7 @@ public class FileReaderController {
     public FileReaderController(FromSoftwareGames game, Path path) {
         switch (game) {
             case ELDEN_RING -> service = new EldenRingService(new EldenRingSaveFileReader(path));
-            case SEKIRO ->  service = new SekiroService(new SekiroSaveFileReader(path));
+            case SEKIRO -> service = new SekiroService(new SekiroSaveFileReader(path));
         }
 
     }

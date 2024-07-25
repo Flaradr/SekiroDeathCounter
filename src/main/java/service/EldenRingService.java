@@ -1,7 +1,7 @@
 package service;
 
 import domain.character.EldenRingCharacter;
-import domain.file.EldenRingSaveFileReader;
+import domain.filereader.EldenRingSaveFileReader;
 import exception.CharacterNotFoundException;
 
 public class EldenRingService implements FromSoftwareService {

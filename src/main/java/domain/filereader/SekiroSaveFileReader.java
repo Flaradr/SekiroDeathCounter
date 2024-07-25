@@ -1,4 +1,4 @@
-package domain.file;
+package domain.filereader;
 
 import domain.character.SekiroCharacter;
 
