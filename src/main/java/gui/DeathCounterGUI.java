@@ -29,5 +29,16 @@ public class DeathCounterGUI extends JFrame {
 
         add(gameUploadGUI.getGameUploadPanel());
         add(gameInformationGUI.getInformationPanel());
+
+        centerDialogOnTheScreen();
+    }
+
+
+    private void centerDialogOnTheScreen() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension dialogSize = this.getSize();
+        int centerPosX = (screenSize.width - dialogSize.width) / 2;
+        int centerPosY = (screenSize.height - dialogSize.height) / 2;
+        setLocation(centerPosX, centerPosY);
     }
 }
