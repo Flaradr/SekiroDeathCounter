@@ -10,8 +10,6 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.nio.file.Path;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -21,22 +19,15 @@ import java.util.concurrent.TimeUnit;
 public class ParameterSelectionGUI {
 
     private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 5;
-    private final static String INPUT_FILE_NOT_LOADED = "Pas de fichier chargé";
-    private static final String DEFAULT_SAVE_PARENT_FOLDER = "APPDATA";
-    public static final String INPUT_FILE_BORDER_TITLE = "Fichier de sauvegarde";
     public static final String PARAMETERS = "Paramètres";
-    public static final String CHOOSE_SAVE_FILE = "Choisir un fichier de sauvegarde";
-    public static final String LOADED_FILE_COLON = "Fichier chargé : ";
     public static final String START_PROGRAM = "Démarrage du programme";
     public static final String PAUSE_PROGRAM = "Pause du programme";
     public static final String RESUME_PROGRAM = "Relance du programme";
 
     private JPanel parameterSelectionPanel;
 
-    private OutputFileSelectionGUI outputFileSelectionGUI;
-    private JPanel inputFileSelectionPanel;
-    private JButton uploadButton;
-    private JLabel chosenGameLabel;
+    private final OutputFileSelectionGUI outputFileSelectionGUI;
+    private final InputFileSelectionGUI inputFileSelectionGUI;
 
 
     private JPanel startPanel;
@@ -44,9 +35,6 @@ public class ParameterSelectionGUI {
     private JSpinner spinner;
     private JButton resetDeathCounterToZeroButton;
     private int numberOfDeathInSaveFile;
-
-
-    private Path chosenGamePath;
 
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
 
@@ -61,10 +49,13 @@ public class ParameterSelectionGUI {
 
     public ParameterSelectionGUI(FileInformation myFileInformation) {
         outputFileSelectionGUI = new OutputFileSelectionGUI();
+
+        inputFileSelectionGUI = new InputFileSelectionGUI();
+
         deathCounterStatus = ProgramStatus.STOPPED;
         charFileInformation = myFileInformation;
         worker = new PausableSwingWorker();
-        chosenGameLabel = new JLabel(INPUT_FILE_NOT_LOADED);
+
         numberOfDeathInSaveFile = 0;
         spinner = new JSpinner();
         spinner.setPreferredSize(new Dimension(100, 20));
@@ -74,38 +65,14 @@ public class ParameterSelectionGUI {
     public void initComponents() {
         parameterSelectionPanel = new JPanel();
         parameterSelectionPanel.setLayout(new GridLayout(3, 0));
-
-        inputFileSelectionPanel = new JPanel();
-        inputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(INPUT_FILE_BORDER_TITLE));
-
         startPanel = new JPanel();
         startPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         Border uploadFile = BorderFactory.createTitledBorder(PARAMETERS);
 
-        uploadButton = new JButton(CHOOSE_SAVE_FILE);
-        uploadButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
-            if (fileChooser.showOpenDialog(uploadButton) == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                chosenGamePath = Path.of(selectedFile.getAbsolutePath());
-                charFileInformation.setFilePath(chosenGamePath);
-                chosenGameLabel.setText(LOADED_FILE_COLON + chosenGamePath.getFileName().toString());
-                startButton.setEnabled(true);
-                resetDeathCounterToZeroButton.setEnabled(true);
-            } else {
-                startButton.setEnabled(false);
-                resetDeathCounterToZeroButton.setEnabled(false);
-            }
-        });
-
-        inputFileSelectionPanel.add(uploadButton);
-        inputFileSelectionPanel.add(chosenGameLabel);
-
         startButton = new JButton(START_PROGRAM);
         startButton.addActionListener(actionListener -> onPressStartButton());
-        startButton.setEnabled(false);
+        startButton.setEnabled(true);
 
         resetDeathCounterToZeroButton = new JButton("Décaler nombre de mort à 0");
         resetDeathCounterToZeroButton.addActionListener(new ActionListener() {
@@ -115,18 +82,16 @@ public class ParameterSelectionGUI {
             }
         });
         spinner.setToolTipText("Permet d'ajouter ou retirer des morts");
-        resetDeathCounterToZeroButton.setEnabled(false);
+        resetDeathCounterToZeroButton.setEnabled(true);
         startPanel.add(resetDeathCounterToZeroButton);
         startPanel.add(new JLabel("Modifier nombre de mort"));
         startPanel.add(spinner);
         startPanel.add(startButton);
 
-        chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
-
         parameterSelectionPanel.setBorder(uploadFile);
 
         parameterSelectionPanel.add(outputFileSelectionGUI.getPanel());
-        parameterSelectionPanel.add(inputFileSelectionPanel);
+        parameterSelectionPanel.add(inputFileSelectionGUI.getInputFileSelectionPanel());
         parameterSelectionPanel.add(startPanel);
     }
 
@@ -136,7 +101,7 @@ public class ParameterSelectionGUI {
 
 
     private void setDeathCounterToZero() {
-        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
+        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), this.inputFileSelectionGUI.getChosenSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
             numberOfDeathInSaveFile = fromSoftwareCharacter.getDeathCount();
@@ -148,7 +113,7 @@ public class ParameterSelectionGUI {
     }
 
     private void updateGameInfo() {
-        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
+        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), this.inputFileSelectionGUI.getChosenSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
             charFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
@@ -169,8 +134,6 @@ public class ParameterSelectionGUI {
     private void onPressStartButton() {
         if (null == charFileInformation.getChosenGame()) {
             startButton.setEnabled(false);
-            chosenGamePath = null;
-            chosenGameLabel.setText(INPUT_FILE_NOT_LOADED);
             displayError("Le jeu n'a pas été sélectionné");
             return;
         }
