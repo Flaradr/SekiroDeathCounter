@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -102,8 +103,13 @@ public class ParameterSelectionGUI {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                deathCounterFilePath = Path.of(fileToSave.getAbsolutePath());
-                outputFileLabel.setText(deathCounterFilePath.toString());
+                if (isASaveFile(fileToSave.getAbsolutePath())) {
+                    displayError("Vous avez sélectionner un fichier de sauvegarde comme fichier où sera sauvegarder le compteur de mort !");
+                } else {
+                    deathCounterFilePath = Path.of(fileToSave.getAbsolutePath());
+                    outputFileLabel.setText(deathCounterFilePath.toString());
+                }
+
             }
         });
 
@@ -173,12 +179,6 @@ public class ParameterSelectionGUI {
         }
     }
 
-    private void updateSpinnerModelMaxValue(int numberOfDeath) {
-        SpinnerModel model = new SpinnerNumberModel(0, Integer.MIN_VALUE + numberOfDeath, numberOfDeath, 1);
-        spinner.setModel(model);
-    }
-
-
     private void updateGameInfo() {
         FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
         try {
@@ -193,12 +193,21 @@ public class ParameterSelectionGUI {
         }
     }
 
+
+    public boolean isASaveFile(String filename) {
+        return Optional.ofNullable(filename)
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(filename.lastIndexOf(".") + 1))
+                .map(s -> (s.equals("sl2")))
+                .orElse(false);
+    }
+
     private void onPressStartButton() {
         if (null == charFileInformation.getChosenGame()) {
             startButton.setEnabled(false);
             chosenGamePath = null;
             chosenGameLabel.setText(INPUT_FILE_NOT_LOADED);
-            handleError("Le jeu n'a pas été sélectionné");
+            displayError("Le jeu n'a pas été sélectionné");
             return;
         }
 
@@ -221,7 +230,7 @@ public class ParameterSelectionGUI {
         }
     }
 
-    private static void handleError(String errorMessage) {
+    private static void displayError(String errorMessage) {
         ErrorDialog foo = new ErrorDialog(errorMessage);
         foo.setVisible(true);
     }

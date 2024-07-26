@@ -12,6 +12,9 @@ public class ErrorDialog extends JDialog {
     public static final String ESCAPE_KEY_NAME = "ESCAPE";
     public static final String CLOSE_BUTTON_LABEL = "Fermer";
     public static final String ERROR_MODAL_LABEL = "Erreur";
+    public static final int MARGIN_SIZE = 30;
+    public static final int PANEL_WIDTH = 480;
+    public static final int PANEL_HEIGHT = 150;
     private final JPanel centerPanel;
     private final JPanel bottomPanel;
 
@@ -28,15 +31,16 @@ public class ErrorDialog extends JDialog {
         setModalityType(ModalityType.APPLICATION_MODAL);
         setResizable(true);
         setLayout(new BorderLayout());
+        setSize(PANEL_WIDTH, PANEL_HEIGHT);
 
         centerPanel = new JPanel();
-        errorLabel = new JLabel(errorMessage);
+        errorLabel = new JLabel(String.format("<html><div WIDTH=%d>%s</div></html>", this.getWidth() - MARGIN_SIZE, errorMessage));
 
         centerPanel.add(errorLabel);
 
 
         bottomPanel = new JPanel();
-        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 15));
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, MARGIN_SIZE, 15));
         buttonClose = new JButton();
         buttonClose.setText(CLOSE_BUTTON_LABEL);
         buttonClose.addActionListener(new ActionListener() {
@@ -48,7 +52,6 @@ public class ErrorDialog extends JDialog {
         bottomPanel.add(buttonClose);
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
-        setSize(480, 150);
 
         registerEscapeKey();
         centerDialogOnTheScreen();
