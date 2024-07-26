@@ -8,6 +8,8 @@ import util.FileWriterWrapper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Executors;
@@ -33,13 +35,24 @@ public class ParameterSelectionGUI {
     public static final String RESUME_PROGRAM = "Relance du programme";
 
     private JPanel parameterSelectionPanel;
+
+
     private JPanel outputFileSelectionPanel;
-    private JPanel inputFileSelectionPanel;
     private JButton fileOutputSelectionButton;
-    private JButton uploadButton;
-    private JButton startButton;
     private JLabel outputFileLabel;
+
+
+    private JPanel inputFileSelectionPanel;
+    private JButton uploadButton;
     private JLabel chosenGameLabel;
+
+
+    private JPanel startPanel;
+    private JButton startButton;
+    private JSpinner spinner;
+    private JButton resetDeathCounterToZeroButton;
+    private int numberOfDeath;
+
 
     private Path chosenGamePath;
     private Path deathCounterFilePath;
@@ -61,19 +74,26 @@ public class ParameterSelectionGUI {
         worker = new PausableSwingWorker();
         outputFileLabel = new JLabel(OUTPUT_FILE_NOT_DEFINED);
         chosenGameLabel = new JLabel(INPUT_FILE_NOT_LOADED);
-
+        numberOfDeath = 0;
+        spinner = new JSpinner();
+        spinner.setPreferredSize(new Dimension(100, 20));
         initComponents();
     }
 
     public void initComponents() {
         parameterSelectionPanel = new JPanel();
         parameterSelectionPanel.setLayout(new GridLayout(3, 0));
+
         outputFileSelectionPanel = new JPanel();
         outputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         outputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(OUTPUT_FILE_BORDER_TITLE));
+
         inputFileSelectionPanel = new JPanel();
         inputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(INPUT_FILE_BORDER_TITLE));
+
+        startPanel = new JPanel();
+        startPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         Border uploadFile = BorderFactory.createTitledBorder(PARAMETERS);
 
@@ -100,8 +120,10 @@ public class ParameterSelectionGUI {
                 charFileInformation.setFilePath(chosenGamePath);
                 chosenGameLabel.setText(LOADED_FILE_COLON + chosenGamePath.getFileName().toString());
                 startButton.setEnabled(true);
+                resetDeathCounterToZeroButton.setEnabled(true);
             } else {
                 startButton.setEnabled(false);
+                resetDeathCounterToZeroButton.setEnabled(false);
             }
         });
 
@@ -112,23 +134,59 @@ public class ParameterSelectionGUI {
         startButton.addActionListener(actionListener -> onPressStartButton());
         startButton.setEnabled(false);
 
+        resetDeathCounterToZeroButton = new JButton("Décaler nombre de mort à 0");
+        resetDeathCounterToZeroButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setDeathCounterToZero();
+            }
+        });
+        spinner.setToolTipText("Permet d'ajouter ou retirer des morts");
+        resetDeathCounterToZeroButton.setEnabled(false);
+        startPanel.add(resetDeathCounterToZeroButton);
+        startPanel.add(new JLabel("Modifier nombre de mort"));
+        startPanel.add(spinner);
+        startPanel.add(startButton);
+
         chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
 
         parameterSelectionPanel.setBorder(uploadFile);
         parameterSelectionPanel.add(outputFileSelectionPanel);
         parameterSelectionPanel.add(inputFileSelectionPanel);
-        parameterSelectionPanel.add(startButton);
+        parameterSelectionPanel.add(startPanel);
     }
 
     public JPanel getParameterSelectionPanel() {
         return this.parameterSelectionPanel;
     }
 
+
+    private void setDeathCounterToZero() {
+        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
+        try {
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
+            numberOfDeath = fromSoftwareCharacter.getDeathCount();
+            SpinnerModel model = new SpinnerNumberModel(numberOfDeath, Integer.MIN_VALUE + numberOfDeath, numberOfDeath, 1);
+            spinner.setModel(model);
+        } catch (NullPointerException exception) {
+            charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());
+        }
+    }
+
+    private void updateSpinnerModelMaxValue(int numberOfDeath) {
+        SpinnerModel model = new SpinnerNumberModel(0, Integer.MIN_VALUE + numberOfDeath, numberOfDeath, 1);
+        spinner.setModel(model);
+    }
+
+
     private void updateGameInfo() {
         FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), chosenGamePath);
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
             charFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
+            numberOfDeath = fromSoftwareCharacter.getDeathCount();
+            SpinnerModel model = new SpinnerNumberModel((int) spinner.getValue(), Integer.MIN_VALUE + numberOfDeath, numberOfDeath, 1);
+            spinner.setModel(model);
             FileWriterWrapper.writeIntInFile(deathCounterFilePath, fromSoftwareCharacter.getDeathCount());
         } catch (NullPointerException exception) {
             charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());
