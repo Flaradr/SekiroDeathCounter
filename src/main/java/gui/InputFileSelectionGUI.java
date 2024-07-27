@@ -1,5 +1,7 @@
 package gui;
 
+import domain.file.SaveFileInformation;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -16,9 +18,10 @@ public class InputFileSelectionGUI {
     private JButton uploadButton;
     private JLabel chosenGameLabel;
 
-    private Path chosenSaveFilePath;
+    private SaveFileInformation saveFileInformation;
 
-    public InputFileSelectionGUI() {
+    public InputFileSelectionGUI(SaveFileInformation saveFileInformation) {
+        this.saveFileInformation = saveFileInformation;
         chosenGameLabel = new JLabel(INPUT_FILE_NOT_LOADED);
         initComponents();
     }
@@ -33,8 +36,8 @@ public class InputFileSelectionGUI {
             JFileChooser fileChooser = new JFileChooser(System.getenv(DEFAULT_SAVE_PARENT_FOLDER));
             if (fileChooser.showOpenDialog(uploadButton) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
-                chosenSaveFilePath = Path.of(selectedFile.getAbsolutePath());
-                chosenGameLabel.setText(LOADED_FILE_COLON + chosenSaveFilePath.getFileName().toString());
+                this.saveFileInformation.setSaveFilePath(Path.of(selectedFile.getAbsolutePath()));
+                chosenGameLabel.setText(LOADED_FILE_COLON + saveFileInformation.getSaveFilePath().getFileName().toString());
             }
         });
         chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -45,9 +48,5 @@ public class InputFileSelectionGUI {
 
     public JPanel getInputFileSelectionPanel() {
         return this.inputFileSelectionPanel;
-    }
-
-    public Path getChosenSaveFilePath() {
-        return this.chosenSaveFilePath;
     }
 }

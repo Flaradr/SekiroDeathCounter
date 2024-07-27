@@ -1,6 +1,6 @@
 package gui;
 
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,19 +13,19 @@ public class DeathCounterGUI extends JFrame {
 
     private static final String APPLICATION_TITLE = "FromSoftware Deaths";
 
-    public DeathCounterGUI(FileInformation myFileInformation) {
-        SwingUtilities.invokeLater(() -> init(myFileInformation));
+    public DeathCounterGUI(SaveFileInformation mySaveFileInformation) {
+        SwingUtilities.invokeLater(() -> init(mySaveFileInformation));
     }
 
-    public void init(FileInformation myFileInformation) {
+    public void init(SaveFileInformation mySaveFileInformation) {
         setTitle(APPLICATION_TITLE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setVisible(true);
         setLayout(new GridLayout(0, 1));
 
-        GameUploadGUI gameUploadGUI = new GameUploadGUI(myFileInformation);
-        GameInformationGUI gameInformationGUI = new GameInformationGUI(myFileInformation);
+        GameUploadGUI gameUploadGUI = new GameUploadGUI(mySaveFileInformation);
+        GameInformationGUI gameInformationGUI = new GameInformationGUI(mySaveFileInformation);
 
         add(gameUploadGUI.getGameUploadPanel());
         add(gameInformationGUI.getInformationPanel());

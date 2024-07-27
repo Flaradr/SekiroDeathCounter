@@ -1,6 +1,6 @@
 package gui;
 
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,17 +9,16 @@ public class GameUploadGUI {
 
     private JPanel gameUploadPanel;
 
-    public GameUploadGUI(FileInformation myFileInformation) {
-        initComponents(myFileInformation);
+    public GameUploadGUI(SaveFileInformation mySaveFileInformation) {
+        initComponents(mySaveFileInformation);
     }
 
-    public void initComponents(FileInformation myFileInformation) {
+    public void initComponents(SaveFileInformation mySaveFileInformation) {
         gameUploadPanel = new JPanel(new BorderLayout());
-        GameSelectionGUI gameSelectionGUI = new GameSelectionGUI(myFileInformation);
-        ParameterSelectionGUI parameterSelectionGUI = new ParameterSelectionGUI(myFileInformation);
+        GameSelectionGUI gameSelectionGUI = new GameSelectionGUI(mySaveFileInformation);
+        ParameterSelectionGUI parameterSelectionGUI = new ParameterSelectionGUI(mySaveFileInformation);
         gameUploadPanel.add(gameSelectionGUI.getGameSelectionPanel(), BorderLayout.NORTH);
         gameUploadPanel.add(parameterSelectionGUI.getParameterSelectionPanel(), BorderLayout.CENTER);
-
     }
 
 

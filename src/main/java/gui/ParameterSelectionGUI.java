@@ -2,14 +2,12 @@ package gui;
 
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 import util.FileWriterWrapper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -23,48 +21,44 @@ public class ParameterSelectionGUI {
     public static final String START_PROGRAM = "Démarrage du programme";
     public static final String PAUSE_PROGRAM = "Pause du programme";
     public static final String RESUME_PROGRAM = "Relance du programme";
+    public static final String GAME_NOT_SELECTED = "Le jeu n'a pas été sélectionné";
 
     private JPanel parameterSelectionPanel;
 
     private final OutputFileSelectionGUI outputFileSelectionGUI;
     private final InputFileSelectionGUI inputFileSelectionGUI;
-
+    private final OptionsSelectionGUI optionsSelectionGUI;
 
     private JPanel startPanel;
     private JButton startButton;
-    private JSpinner spinner;
-    private JButton resetDeathCounterToZeroButton;
-    private int numberOfDeathInSaveFile;
 
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
 
     private ProgramStatus deathCounterStatus;
 
-    FileInformation charFileInformation;
+    SaveFileInformation charSaveFileInformation;
     ScheduledFuture future;
     PausableSwingWorker worker;
 
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
 
-    public ParameterSelectionGUI(FileInformation myFileInformation) {
+    public ParameterSelectionGUI(SaveFileInformation mySaveFileInformation) {
         outputFileSelectionGUI = new OutputFileSelectionGUI();
+        inputFileSelectionGUI = new InputFileSelectionGUI(mySaveFileInformation);
 
-        inputFileSelectionGUI = new InputFileSelectionGUI();
+        optionsSelectionGUI = new OptionsSelectionGUI(mySaveFileInformation);
 
         deathCounterStatus = ProgramStatus.STOPPED;
-        charFileInformation = myFileInformation;
+        charSaveFileInformation = mySaveFileInformation;
         worker = new PausableSwingWorker();
 
-        numberOfDeathInSaveFile = 0;
-        spinner = new JSpinner();
-        spinner.setPreferredSize(new Dimension(100, 20));
         initComponents();
     }
 
     public void initComponents() {
         parameterSelectionPanel = new JPanel();
-        parameterSelectionPanel.setLayout(new GridLayout(3, 0));
+        parameterSelectionPanel.setLayout(new GridLayout(4, 0));
         startPanel = new JPanel();
         startPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -74,24 +68,13 @@ public class ParameterSelectionGUI {
         startButton.addActionListener(actionListener -> onPressStartButton());
         startButton.setEnabled(true);
 
-        resetDeathCounterToZeroButton = new JButton("Décaler nombre de mort à 0");
-        resetDeathCounterToZeroButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setDeathCounterToZero();
-            }
-        });
-        spinner.setToolTipText("Permet d'ajouter ou retirer des morts");
-        resetDeathCounterToZeroButton.setEnabled(true);
-        startPanel.add(resetDeathCounterToZeroButton);
-        startPanel.add(new JLabel("Modifier nombre de mort"));
-        startPanel.add(spinner);
         startPanel.add(startButton);
 
         parameterSelectionPanel.setBorder(uploadFile);
 
         parameterSelectionPanel.add(outputFileSelectionGUI.getPanel());
         parameterSelectionPanel.add(inputFileSelectionGUI.getInputFileSelectionPanel());
+        parameterSelectionPanel.add(optionsSelectionGUI.getPanel());
         parameterSelectionPanel.add(startPanel);
     }
 
@@ -99,42 +82,32 @@ public class ParameterSelectionGUI {
         return this.parameterSelectionPanel;
     }
 
-
-    private void setDeathCounterToZero() {
-        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), this.inputFileSelectionGUI.getChosenSaveFilePath());
-        try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            numberOfDeathInSaveFile = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(numberOfDeathInSaveFile, Integer.MIN_VALUE + numberOfDeathInSaveFile, numberOfDeathInSaveFile, 1);
-            spinner.setModel(model);
-        } catch (NullPointerException exception) {
-            charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());
-        }
-    }
-
     private void updateGameInfo() {
-        FileReaderController fileReaderController = new FileReaderController(charFileInformation.getChosenGame(), this.inputFileSelectionGUI.getChosenSaveFilePath());
+        FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            charFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
-            numberOfDeathInSaveFile = fromSoftwareCharacter.getDeathCount();
-            System.out.println("Number of death : " + computeDeathWithOffset());
-            SpinnerModel model = new SpinnerNumberModel((int) spinner.getValue(), Integer.MIN_VALUE + numberOfDeathInSaveFile, numberOfDeathInSaveFile, 1);
-            spinner.setModel(model);
+            charSaveFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
+            charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
+            SpinnerModel model = new SpinnerNumberModel(optionsSelectionGUI.getOffsetValue(),
+                    -charSaveFileInformation.getNumberOfDeath(),
+                    Integer.MAX_VALUE - charSaveFileInformation.getNumberOfDeath(),
+                    1);
+            optionsSelectionGUI.changeSpinnerModel(model);
+
             FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), computeDeathWithOffset());
         } catch (NullPointerException exception) {
-            charFileInformation.setStringifiedData("Solution pas encore développée pour : " + charFileInformation.getChosenGame().getFullName());
+            charSaveFileInformation.setStringifiedData("Solution pas encore développée pour : " + charSaveFileInformation.getChosenGame().getFullName());
         }
     }
 
     private int computeDeathWithOffset() {
-        return numberOfDeathInSaveFile - (int) spinner.getValue();
+        return charSaveFileInformation.getNumberOfDeath() + optionsSelectionGUI.getOffsetValue();
     }
 
     private void onPressStartButton() {
-        if (null == charFileInformation.getChosenGame()) {
+        if (null == charSaveFileInformation.getChosenGame()) {
             startButton.setEnabled(false);
-            displayError("Le jeu n'a pas été sélectionné");
+            displayError(GAME_NOT_SELECTED);
             return;
         }
 

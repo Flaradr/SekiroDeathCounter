@@ -1,6 +1,6 @@
 package gui;
 
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -9,11 +9,11 @@ import java.awt.*;
 public class GameInformationGUI {
     JPanel informationPanel;
 
-    public GameInformationGUI(FileInformation myFileInformation) {
-        initComponents(myFileInformation);
+    public GameInformationGUI(SaveFileInformation mySaveFileInformation) {
+        initComponents(mySaveFileInformation);
     }
 
-    public void initComponents(FileInformation myFileInformation) {
+    public void initComponents(SaveFileInformation mySaveFileInformation) {
         informationPanel = new JPanel();
         final JLabel gameInformationLabel = new JLabel();
         gameInformationLabel.setVisible(true);
@@ -22,7 +22,7 @@ public class GameInformationGUI {
         informationPanel.setBorder(informationBorder);
         informationPanel.add(gameInformationLabel, BorderLayout.NORTH);
 
-        gameInformationLabel.setText(myFileInformation.getStringifiedData());
+        gameInformationLabel.setText(mySaveFileInformation.getStringifiedData());
     }
 
     public JPanel getInformationPanel() {
