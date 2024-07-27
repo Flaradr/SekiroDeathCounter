@@ -18,10 +18,11 @@ public class ParameterSelectionGUI {
 
     private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 5;
     public static final String PARAMETERS = "Paramètres";
-    public static final String START_PROGRAM = "Démarrage du programme";
-    public static final String PAUSE_PROGRAM = "Pause du programme";
-    public static final String RESUME_PROGRAM = "Relance du programme";
+    public static final String START_PROGRAM = "Démarrer le compteur";
+    public static final String PAUSE_PROGRAM = "Pause";
+    public static final String RESUME_PROGRAM = "Reprise";
     public static final String GAME_NOT_SELECTED = "Le jeu n'a pas été sélectionné";
+    public static final String SAVE_FILE_NOT_SELECTED = "Le fichier de sauvegarde n'a pas été choisi";
 
     private JPanel parameterSelectionPanel;
 
@@ -29,7 +30,6 @@ public class ParameterSelectionGUI {
     private final InputFileSelectionGUI inputFileSelectionGUI;
     private final OptionsSelectionGUI optionsSelectionGUI;
 
-    private JPanel startPanel;
     private JButton startButton;
 
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
@@ -59,8 +59,6 @@ public class ParameterSelectionGUI {
     public void initComponents() {
         parameterSelectionPanel = new JPanel();
         parameterSelectionPanel.setLayout(new GridLayout(4, 0));
-        startPanel = new JPanel();
-        startPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         Border uploadFile = BorderFactory.createTitledBorder(PARAMETERS);
 
@@ -68,14 +66,13 @@ public class ParameterSelectionGUI {
         startButton.addActionListener(actionListener -> onPressStartButton());
         startButton.setEnabled(true);
 
-        startPanel.add(startButton);
 
         parameterSelectionPanel.setBorder(uploadFile);
 
         parameterSelectionPanel.add(outputFileSelectionGUI.getPanel());
         parameterSelectionPanel.add(inputFileSelectionGUI.getInputFileSelectionPanel());
         parameterSelectionPanel.add(optionsSelectionGUI.getPanel());
-        parameterSelectionPanel.add(startPanel);
+        parameterSelectionPanel.add(startButton);
     }
 
     public JPanel getParameterSelectionPanel() {
@@ -106,8 +103,12 @@ public class ParameterSelectionGUI {
 
     private void onPressStartButton() {
         if (null == charSaveFileInformation.getChosenGame()) {
-            startButton.setEnabled(false);
             displayError(GAME_NOT_SELECTED);
+            return;
+        }
+
+        if (null == charSaveFileInformation.getSaveFilePath()) {
+            displayError(SAVE_FILE_NOT_SELECTED);
             return;
         }
 

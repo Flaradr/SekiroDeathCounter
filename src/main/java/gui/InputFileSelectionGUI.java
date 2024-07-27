@@ -28,8 +28,16 @@ public class InputFileSelectionGUI {
 
     public void initComponents() {
         inputFileSelectionPanel = new JPanel();
-        inputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        inputFileSelectionPanel.setLayout(new GridBagLayout());
         inputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(INPUT_FILE_BORDER_TITLE));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(0,10,0,0);
 
         uploadButton = new JButton(CHOOSE_SAVE_FILE);
         uploadButton.addActionListener(e -> {
@@ -42,8 +50,9 @@ public class InputFileSelectionGUI {
         });
         chosenGameLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        inputFileSelectionPanel.add(uploadButton);
-        inputFileSelectionPanel.add(chosenGameLabel);
+        inputFileSelectionPanel.add(uploadButton, gbc);
+        gbc.gridy++;
+        inputFileSelectionPanel.add(chosenGameLabel, gbc);
     }
 
     public JPanel getInputFileSelectionPanel() {

@@ -16,7 +16,7 @@ public class OptionsSelectionGUI {
     public static final String RESET_TO_ZERO = "Mise à 0 du compteur";
     public static final String OPTIONS = "Options";
     public static final String LABEL_SPINNER_INCREASE_OR_DECREASE_DEATH = "Ajouter ou retirer des morts";
-    public static final String SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH = "Permet d'ajouter ou retirer des morts";
+    public static final String SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH = "Le minimum est le nombre de mort existant dans le fichier de sauvegarde";
     private final JPanel optionPanel;
     private JButton resetDeathCounterToZeroButton;
     private final JLabel label;
@@ -41,8 +41,17 @@ public class OptionsSelectionGUI {
     }
 
     public void initComponents() {
-        optionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        optionPanel.setLayout(new GridBagLayout());
         optionPanel.setBorder(BorderFactory.createTitledBorder(OPTIONS));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(0, 10, 0, 0);
+
         resetDeathCounterToZeroButton = new JButton(RESET_TO_ZERO);
         resetDeathCounterToZeroButton.addActionListener(new ActionListener() {
             @Override
@@ -53,9 +62,15 @@ public class OptionsSelectionGUI {
         spinner.setToolTipText(SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH);
         resetDeathCounterToZeroButton.setEnabled(true);
 
-        optionPanel.add(resetDeathCounterToZeroButton);
-        optionPanel.add(label);
-        optionPanel.add(spinner);
+        optionPanel.add(label, gbc);
+        gbc.gridx++;
+        gbc.insets = new Insets(0, -180, 0, 0);
+        optionPanel.add(spinner, gbc);
+        gbc.gridy++;
+        gbc.gridx--;
+        gbc.insets = new Insets(0, 10, 0, 0);
+        optionPanel.add(resetDeathCounterToZeroButton, gbc);
+
     }
 
     public int getOffsetValue() {

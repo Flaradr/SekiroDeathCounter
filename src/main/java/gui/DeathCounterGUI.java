@@ -22,13 +22,22 @@ public class DeathCounterGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setVisible(true);
-        setLayout(new GridLayout(0, 1));
+        setResizable(false);
+        setLayout(new GridBagLayout());
 
         GameUploadGUI gameUploadGUI = new GameUploadGUI(mySaveFileInformation);
         GameInformationGUI gameInformationGUI = new GameInformationGUI(mySaveFileInformation);
 
-        add(gameUploadGUI.getGameUploadPanel());
-        add(gameInformationGUI.getInformationPanel());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.gridy = 0;
+        getContentPane().add(gameUploadGUI.getGameUploadPanel(), constraints);
+
+        constraints.gridy = 1;
+        getContentPane().add(gameInformationGUI.getInformationPanel(), constraints);
 
         centerDialogOnTheScreen();
     }

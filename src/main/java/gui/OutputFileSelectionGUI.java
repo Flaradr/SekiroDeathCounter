@@ -25,9 +25,16 @@ public class OutputFileSelectionGUI {
     }
 
     public void initComponents() {
-        outputFileSelectionPanel = new JPanel();
-        outputFileSelectionPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        outputFileSelectionPanel = new JPanel(new GridBagLayout());
         outputFileSelectionPanel.setBorder(BorderFactory.createTitledBorder(OUTPUT_FILE_BORDER_TITLE));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(0,10,0,0);
 
         fileOutputSelectionButton = new JButton(CHOOSE_OUTPUT_FILE);
         fileOutputSelectionButton.addActionListener(e -> {
@@ -44,8 +51,9 @@ public class OutputFileSelectionGUI {
             }
         });
 
-        outputFileSelectionPanel.add(fileOutputSelectionButton);
-        outputFileSelectionPanel.add(outputFileLabel);
+        outputFileSelectionPanel.add(fileOutputSelectionButton, gbc);
+        gbc.gridy++;
+        outputFileSelectionPanel.add(outputFileLabel, gbc);
     }
 
 
