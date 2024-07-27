@@ -42,6 +42,7 @@ public class SaveFileInformation {
     }
 
     public void setStringifiedData(String stringifiedData) {
+        firePropertyChange(stringifiedData, this.stringifiedData, stringifiedData);
         this.stringifiedData = stringifiedData;
     }
 
@@ -61,7 +62,7 @@ public class SaveFileInformation {
         listeners.remove(listener);
     }
 
-    protected void firePropertyChange(String editable, boolean oldValue, boolean newValue) {
+    protected void firePropertyChange(String editable, String oldValue, String newValue) {
         PropertyChangeEvent evt = new PropertyChangeEvent(this, editable, oldValue, newValue);
         for (PropertyChangeListener listener : listeners) {
             listener.propertyChange(evt);

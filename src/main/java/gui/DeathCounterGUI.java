@@ -25,7 +25,7 @@ public class DeathCounterGUI extends JFrame {
         setResizable(false);
         setLayout(new GridBagLayout());
 
-        GameUploadGUI gameUploadGUI = new GameUploadGUI(mySaveFileInformation);
+        InputOutputGUI inputOutputGUI = new InputOutputGUI(mySaveFileInformation);
         GameInformationGUI gameInformationGUI = new GameInformationGUI(mySaveFileInformation);
 
 
@@ -34,7 +34,7 @@ public class DeathCounterGUI extends JFrame {
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridy = 0;
-        getContentPane().add(gameUploadGUI.getGameUploadPanel(), constraints);
+        getContentPane().add(inputOutputGUI.getGameUploadPanel(), constraints);
 
         constraints.gridy = 1;
         getContentPane().add(gameInformationGUI.getInformationPanel(), constraints);

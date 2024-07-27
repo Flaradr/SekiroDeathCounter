@@ -44,13 +44,13 @@ public class ParameterSelectionGUI {
 
 
     public ParameterSelectionGUI(SaveFileInformation mySaveFileInformation) {
+        charSaveFileInformation = mySaveFileInformation;
+
         outputFileSelectionGUI = new OutputFileSelectionGUI();
         inputFileSelectionGUI = new InputFileSelectionGUI(mySaveFileInformation);
-
         optionsSelectionGUI = new OptionsSelectionGUI(mySaveFileInformation);
 
         deathCounterStatus = ProgramStatus.STOPPED;
-        charSaveFileInformation = mySaveFileInformation;
         worker = new PausableSwingWorker();
 
         initComponents();
@@ -83,15 +83,9 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            charSaveFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
-            charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
-            SpinnerModel model = new SpinnerNumberModel(optionsSelectionGUI.getOffsetValue(),
-                    -charSaveFileInformation.getNumberOfDeath(),
-                    Integer.MAX_VALUE - charSaveFileInformation.getNumberOfDeath(),
-                    1);
-            optionsSelectionGUI.changeSpinnerModel(model);
-
             FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), computeDeathWithOffset());
+            charSaveFileInformation.setStringifiedData("Nombre de mort : " + computeDeathWithOffset());
+            charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
         } catch (NullPointerException exception) {
             charSaveFileInformation.setStringifiedData("Solution pas encore développée pour : " + charSaveFileInformation.getChosenGame().getFullName());
         }

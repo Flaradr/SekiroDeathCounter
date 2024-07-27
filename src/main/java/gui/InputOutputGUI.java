@@ -5,11 +5,11 @@ import domain.file.SaveFileInformation;
 import javax.swing.*;
 import java.awt.*;
 
-public class GameUploadGUI {
+public class InputOutputGUI {
 
     private JPanel gameUploadPanel;
 
-    public GameUploadGUI(SaveFileInformation mySaveFileInformation) {
+    public InputOutputGUI(SaveFileInformation mySaveFileInformation) {
         initComponents(mySaveFileInformation);
     }
 
