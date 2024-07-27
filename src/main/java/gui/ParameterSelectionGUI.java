@@ -35,6 +35,7 @@ public class ParameterSelectionGUI {
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
 
     private ProgramStatus deathCounterStatus;
+    private int writtenValue;
 
     SaveFileInformation charSaveFileInformation;
     ScheduledFuture future;
@@ -83,9 +84,13 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), computeDeathWithOffset());
-            charSaveFileInformation.setStringifiedData("Nombre de mort : " + computeDeathWithOffset());
-            charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
+            if (writtenValue != fromSoftwareCharacter.getDeathCount() + optionsSelectionGUI.getOffsetValue()) {
+                charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
+                charSaveFileInformation.setStringifiedData("Nombre de mort : " + computeDeathWithOffset());
+                writtenValue = computeDeathWithOffset();
+                FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), writtenValue);
+            }
+
         } catch (NullPointerException exception) {
             charSaveFileInformation.setStringifiedData("Solution pas encore développée pour : " + charSaveFileInformation.getChosenGame().getFullName());
         }
