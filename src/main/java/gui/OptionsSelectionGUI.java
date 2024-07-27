@@ -17,8 +17,12 @@ public class OptionsSelectionGUI {
     public static final String OPTIONS = "Options";
     public static final String LABEL_SPINNER_INCREASE_OR_DECREASE_DEATH = "Ajouter ou retirer des morts";
     public static final String SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH = "Le minimum est le nombre de mort existant dans le fichier de sauvegarde";
+    public static final String GAME_NOT_SELECTED = "Le jeu n'a pas été sélectionné";
+    public static final String SAVE_FILE_NOT_SELECTED = "Le fichier de sauvegarde n'a pas été choisi";
+
     private final JPanel optionPanel;
     private JButton resetDeathCounterToZeroButton;
+    private JButton resetSpinnerDefaultValueButton;
     private final JLabel label;
     private final JSpinner spinner;
     private final SaveFileInformation saveFileInformation;
@@ -59,18 +63,29 @@ public class OptionsSelectionGUI {
                 setDeathCounterToZero();
             }
         });
+
+        resetSpinnerDefaultValueButton = new JButton("Reset");
+        resetSpinnerDefaultValueButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reinitializeSpinner();
+            }
+        });
+
         spinner.setToolTipText(SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH);
         resetDeathCounterToZeroButton.setEnabled(true);
 
         optionPanel.add(label, gbc);
-        gbc.gridx++;
-        gbc.insets = new Insets(0, -180, 0, 0);
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, -60, 0, 0);
         optionPanel.add(spinner, gbc);
-        gbc.gridy++;
-        gbc.gridx--;
+        gbc.gridx = 2;
+        gbc.insets = new Insets(0, -90, 0, 0);
+        optionPanel.add(resetSpinnerDefaultValueButton, gbc);
+        gbc.gridy = 1;
+        gbc.gridx = 0;
         gbc.insets = new Insets(0, 10, 0, 0);
         optionPanel.add(resetDeathCounterToZeroButton, gbc);
-
     }
 
     public int getOffsetValue() {
@@ -87,6 +102,16 @@ public class OptionsSelectionGUI {
 
 
     private void setDeathCounterToZero() {
+        if (null == saveFileInformation.getChosenGame()) {
+            displayError(GAME_NOT_SELECTED);
+            return;
+        }
+
+        if (null == saveFileInformation.getSaveFilePath()) {
+            displayError(SAVE_FILE_NOT_SELECTED);
+            return;
+        }
+
         FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
@@ -96,6 +121,16 @@ public class OptionsSelectionGUI {
         } catch (NullPointerException exception) {
             saveFileInformation.setStringifiedData("Solution pas encore développée pour : " + saveFileInformation.getChosenGame().getFullName());
         }
+    }
+
+
+    private void reinitializeSpinner() {
+        spinner.setValue(0);
+    }
+
+    private static void displayError(String errorMessage) {
+        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
+        errorDialog.setVisible(true);
     }
 
 }
