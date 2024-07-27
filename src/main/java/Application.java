@@ -1,4 +1,4 @@
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 import gui.DeathCounterGUI;
 
 import javax.swing.*;
@@ -9,8 +9,8 @@ public class Application {
 
     public static void main(String[] args) {
         setupGlobalExceptionHandling();
-        FileInformation myFileInformation = new FileInformation();
-        gui = new DeathCounterGUI(myFileInformation);
+        SaveFileInformation mySaveFileInformation = new SaveFileInformation();
+        gui = new DeathCounterGUI(mySaveFileInformation);
     }
 
     public static void setupGlobalExceptionHandling() {

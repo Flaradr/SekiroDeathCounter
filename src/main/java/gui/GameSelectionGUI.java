@@ -1,7 +1,7 @@
 package gui;
 
 import domain.FromSoftwareGames;
-import domain.file.FileInformation;
+import domain.file.SaveFileInformation;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -13,11 +13,11 @@ public class GameSelectionGUI {
     private FromSoftwareGames chosenGame;
 
 
-    public GameSelectionGUI(FileInformation myFileInformation) {
-        initComponents(myFileInformation);
+    public GameSelectionGUI(SaveFileInformation mySaveFileInformation) {
+        initComponents(mySaveFileInformation);
     }
 
-    public void initComponents(FileInformation myFileInformation) {
+    public void initComponents(SaveFileInformation mySaveFileInformation) {
         gameSelectionPanel = new JPanel(new GridLayout(0, 1));
         Border gameSelectionBorder = BorderFactory.createTitledBorder(GAME_LIST_TITLE);
         gameSelectionPanel.setBorder(gameSelectionBorder);
@@ -27,7 +27,7 @@ public class GameSelectionGUI {
             AbstractButton jButton = new JRadioButton(game.getFullName());
             jButton.addActionListener(actionListener -> {
                 chosenGame = game;
-                myFileInformation.setChosenGame(game);
+                mySaveFileInformation.setChosenGame(game);
             });
             gameSelectionPanel.add(jButton);
             gameSelectionButtons.add(jButton);
