@@ -1,6 +1,7 @@
 package domain.file;
 
 import domain.FromSoftwareGames;
+import domain.character.FromSoftwareCharacter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -10,12 +11,12 @@ import java.util.Set;
 
 public class SaveFileInformation {
 
-    private Set<PropertyChangeListener> listeners;
+    private final Set<PropertyChangeListener> listeners;
 
     private Path saveFilePath;
     private FromSoftwareGames chosenGame;
-    private String stringifiedData;
-    private int numberOfDeath;
+    private FromSoftwareCharacter character;
+
 
     public SaveFileInformation() {
         listeners = new HashSet<>(25);
@@ -37,20 +38,30 @@ public class SaveFileInformation {
         this.chosenGame = chosenGame;
     }
 
-    public String getStringifiedData() {
-        return stringifiedData;
+    public void setCharacter(FromSoftwareCharacter character) {
+        this.character = character;
+        refreshData();
     }
 
-    public void setStringifiedData(String stringifiedData) {
-        this.stringifiedData = stringifiedData;
+    public int getCharacterNumberOfDeath() {
+        return character.getDeathCount();
+    }
+
+    public FromSoftwareCharacter getCharacter() {
+        return character;
+    }
+
+    public void refreshData() {
+        firePropertyChange("", null, null);
     }
 
     public int getNumberOfDeath() {
-        return numberOfDeath;
+        return character.getDeathCount();
     }
 
-    public void setNumberOfDeath(int numberOfDeath) {
-        this.numberOfDeath = numberOfDeath;
+    public void updateNumberOfDeath(int numberOfDeath) {
+        character.setDeathCount(numberOfDeath);
+        refreshData();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -61,7 +72,7 @@ public class SaveFileInformation {
         listeners.remove(listener);
     }
 
-    protected void firePropertyChange(String editable, boolean oldValue, boolean newValue) {
+    protected void firePropertyChange(String editable, String oldValue, String newValue) {
         PropertyChangeEvent evt = new PropertyChangeEvent(this, editable, oldValue, newValue);
         for (PropertyChangeListener listener : listeners) {
             listener.propertyChange(evt);

@@ -42,7 +42,7 @@ public abstract class FromSoftwareCharacter {
 
         return "\nNom : " +
                 name +
-                "\nNombre de mort : " +
+                "\nNombre de morts : " +
                 deathCount +
                 "\nNiveau : " +
                 level;
@@ -52,10 +52,23 @@ public abstract class FromSoftwareCharacter {
         return "<html>\n" +
                 "<ul>\n" +
                 "<li>Nom : " + name + "</font>\n" +
-                "<li>Nombre de mort : <font color=red>" + deathCount + "</font>\n" +
+                "<li>Nombre de morts : <font color=red>" + deathCount + "</font>\n" +
                 "<li>Niveau : <font color=green>" + level + "</font>\n" +
                 "</ul>\n" +
                 "</html>";
+    }
+
+    public boolean equals(Object obj) {
+        switch (obj) {
+            case FromSoftwareCharacter character -> {
+                return this.getDeathCount() == character.getDeathCount() &&
+                        this.getLevel() == character.getLevel() &&
+                        this.getName().equals(character.getName());
+            }
+            case null, default -> {
+                return false;
+            }
+        }
     }
 
 }

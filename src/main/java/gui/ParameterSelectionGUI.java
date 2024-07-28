@@ -40,17 +40,17 @@ public class ParameterSelectionGUI {
     ScheduledFuture future;
     PausableSwingWorker worker;
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
 
     public ParameterSelectionGUI(SaveFileInformation mySaveFileInformation) {
+        charSaveFileInformation = mySaveFileInformation;
+
         outputFileSelectionGUI = new OutputFileSelectionGUI();
         inputFileSelectionGUI = new InputFileSelectionGUI(mySaveFileInformation);
-
         optionsSelectionGUI = new OptionsSelectionGUI(mySaveFileInformation);
 
         deathCounterStatus = ProgramStatus.STOPPED;
-        charSaveFileInformation = mySaveFileInformation;
         worker = new PausableSwingWorker();
 
         initComponents();
@@ -83,18 +83,29 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            charSaveFileInformation.setStringifiedData("Nombre de mort : " + fromSoftwareCharacter.getDeathCount());
-            charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
-            SpinnerModel model = new SpinnerNumberModel(optionsSelectionGUI.getOffsetValue(),
-                    -charSaveFileInformation.getNumberOfDeath(),
-                    Integer.MAX_VALUE - charSaveFileInformation.getNumberOfDeath(),
-                    1);
-            optionsSelectionGUI.changeSpinnerModel(model);
-
-            FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), computeDeathWithOffset());
+            if (!fromSoftwareCharacter.equals(charSaveFileInformation.getCharacter())) {
+                charSaveFileInformation.setCharacter(fromSoftwareCharacter);
+                int numberOfDeathWithOffset = computeDeathWithOffset();
+                charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
+                writeInSelectedFile(numberOfDeathWithOffset);
+            }
         } catch (NullPointerException exception) {
-            charSaveFileInformation.setStringifiedData("Solution pas encore développée pour : " + charSaveFileInformation.getChosenGame().getFullName());
+            displayError(exception.getMessage());
         }
+    }
+
+    /**
+     * Write the number of death in the file
+     * If no file is selected do nothing
+     *
+     * @param numberOfDeathWithOffset the number of death to be written
+     */
+    private void writeInSelectedFile(int numberOfDeathWithOffset) {
+        if (null == this.outputFileSelectionGUI.getNumberOfDeathFilePath()) {
+            return;
+        }
+        FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), numberOfDeathWithOffset);
+
     }
 
     private int computeDeathWithOffset() {
@@ -112,20 +123,24 @@ public class ParameterSelectionGUI {
             return;
         }
 
+        charSaveFileInformation.refreshData();
         switch (deathCounterStatus) {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
+                optionsSelectionGUI.setEnabled(false);
                 worker.execute();
             }
             case RUNNING -> {
                 deathCounterStatus = ProgramStatus.PAUSED;
                 startButton.setText(RESUME_PROGRAM);
+                optionsSelectionGUI.setEnabled(true);
                 worker.pause();
             }
             case PAUSED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
+                optionsSelectionGUI.setEnabled(false);
                 worker.resume();
             }
         }

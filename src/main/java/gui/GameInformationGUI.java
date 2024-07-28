@@ -5,27 +5,45 @@ import domain.file.SaveFileInformation;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class GameInformationGUI {
-    JPanel informationPanel;
+    public static final String SAVE_FILE_INFORMATIONS = "Informations sur la sauvegarde";
+    public static final String No_INFORMATION_AVAILABLE = "Aucune information disponible";
+
+    private final SaveFileInformation saveFileInformation;
+    private JPanel informationPanel;
+    private final JLabel gameInformationLabel;
 
     public GameInformationGUI(SaveFileInformation mySaveFileInformation) {
-        initComponents(mySaveFileInformation);
+        gameInformationLabel = new JLabel(No_INFORMATION_AVAILABLE);
+        saveFileInformation = mySaveFileInformation;
+        saveFileInformation.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateInformations();
+            }
+        });
+        initComponents();
     }
 
-    public void initComponents(SaveFileInformation mySaveFileInformation) {
+    public void initComponents() {
         informationPanel = new JPanel();
-        final JLabel gameInformationLabel = new JLabel();
         gameInformationLabel.setVisible(true);
-        Border informationBorder = BorderFactory.createTitledBorder("Informations sur la sauvegarde");
+        Border informationBorder = BorderFactory.createTitledBorder(SAVE_FILE_INFORMATIONS);
         informationPanel.setLayout(new BorderLayout());
         informationPanel.setBorder(informationBorder);
         informationPanel.add(gameInformationLabel, BorderLayout.NORTH);
-
-        gameInformationLabel.setText(mySaveFileInformation.getStringifiedData());
     }
 
     public JPanel getInformationPanel() {
         return this.informationPanel;
+    }
+
+    protected void updateInformations() {
+        if (null != saveFileInformation && null != saveFileInformation.getCharacter()) {
+            gameInformationLabel.setText(saveFileInformation.getCharacter().toHtmlString());
+        }
     }
 }

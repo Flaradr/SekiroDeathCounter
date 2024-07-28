@@ -8,7 +8,7 @@ import java.io.InputStream;
 public class InputStreamReader {
 
     /**
-     * Read every bytes of a file.
+     * Read every byte of a file.
      *
      * @param filePath The absolute path of the file to be read
      */

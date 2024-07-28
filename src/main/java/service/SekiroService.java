@@ -6,7 +6,7 @@ import exception.CharacterNotFoundException;
 
 public class SekiroService implements FromSoftwareService {
 
-    private SekiroSaveFileReader content;
+    private final SekiroSaveFileReader content;
 
     public SekiroService(SekiroSaveFileReader content) {
         this.content = content;

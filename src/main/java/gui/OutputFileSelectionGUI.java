@@ -15,7 +15,7 @@ public class OutputFileSelectionGUI {
 
     private JPanel outputFileSelectionPanel;
     private JButton fileOutputSelectionButton;
-    private JLabel outputFileLabel;
+    private final JLabel outputFileLabel;
     private Path numberOfDeathFilePath;
 
 
@@ -34,7 +34,7 @@ public class OutputFileSelectionGUI {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.insets = new Insets(0,10,0,0);
+        gbc.insets = new Insets(0, 10, 0, 0);
 
         fileOutputSelectionButton = new JButton(CHOOSE_OUTPUT_FILE);
         fileOutputSelectionButton.addActionListener(e -> {
