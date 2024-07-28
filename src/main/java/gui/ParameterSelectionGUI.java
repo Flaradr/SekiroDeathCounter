@@ -35,7 +35,6 @@ public class ParameterSelectionGUI {
     enum ProgramStatus {RUNNING, PAUSED, STOPPED}
 
     private ProgramStatus deathCounterStatus;
-    private int writtenValue;
 
     SaveFileInformation charSaveFileInformation;
     ScheduledFuture future;
@@ -84,16 +83,29 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            if (writtenValue != fromSoftwareCharacter.getDeathCount() + optionsSelectionGUI.getOffsetValue()) {
-                charSaveFileInformation.setNumberOfDeath(fromSoftwareCharacter.getDeathCount());
-                charSaveFileInformation.setStringifiedData("Nombre de mort : " + computeDeathWithOffset());
-                writtenValue = computeDeathWithOffset();
-                FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), writtenValue);
+            if (!fromSoftwareCharacter.equals(charSaveFileInformation.getCharacter())) {
+                charSaveFileInformation.setCharacter(fromSoftwareCharacter);
+                int numberOfDeathWithOffset = computeDeathWithOffset();
+                charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
+                writeInSelectedFile(numberOfDeathWithOffset);
             }
-
         } catch (NullPointerException exception) {
-            charSaveFileInformation.setStringifiedData("Solution pas encore développée pour : " + charSaveFileInformation.getChosenGame().getFullName());
+            displayError(exception.getMessage());
         }
+    }
+
+    /**
+     * Write the number of death in the file
+     * If no file is selected do nothing
+     *
+     * @param numberOfDeathWithOffset the number of death to be written
+     */
+    private void writeInSelectedFile(int numberOfDeathWithOffset) {
+        if (null == this.outputFileSelectionGUI.getNumberOfDeathFilePath()) {
+            return;
+        }
+        FileWriterWrapper.writeIntInFile(this.outputFileSelectionGUI.getNumberOfDeathFilePath(), numberOfDeathWithOffset);
+
     }
 
     private int computeDeathWithOffset() {
@@ -111,20 +123,24 @@ public class ParameterSelectionGUI {
             return;
         }
 
+        charSaveFileInformation.refreshData();
         switch (deathCounterStatus) {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
+                optionsSelectionGUI.setEnabled(false);
                 worker.execute();
             }
             case RUNNING -> {
                 deathCounterStatus = ProgramStatus.PAUSED;
                 startButton.setText(RESUME_PROGRAM);
+                optionsSelectionGUI.setEnabled(true);
                 worker.pause();
             }
             case PAUSED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
+                optionsSelectionGUI.setEnabled(false);
                 worker.resume();
             }
         }

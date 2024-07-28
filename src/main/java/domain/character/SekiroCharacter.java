@@ -7,7 +7,7 @@ public class SekiroCharacter extends FromSoftwareCharacter {
         return "<html>\n" +
                 "<ul>\n" +
                 "<li>Nom : " + super.getName() + "</font>\n" +
-                "<li>Nombre de mort : " + super.getDeathCount() + "</font>\n" +
+                "<li>Nombre de morts : " + super.getDeathCount() + "</font>\n" +
                 "</ul>\n" +
                 "</html>";
     }

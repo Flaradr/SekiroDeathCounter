@@ -5,9 +5,13 @@ import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static java.util.Arrays.asList;
 
 public class OptionsSelectionGUI {
 
@@ -24,12 +28,21 @@ public class OptionsSelectionGUI {
     private final JLabel label;
     private final JSpinner spinner;
     private final SaveFileInformation saveFileInformation;
+    private int currentNumberOfDeath;
 
     public OptionsSelectionGUI(SaveFileInformation saveFileInformation) {
         this.saveFileInformation = saveFileInformation;
-
         optionPanel = new JPanel();
         spinner = new JSpinner();
+
+        spinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSpinner s = (JSpinner) e.getSource();
+                saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) s.getValue());
+            }
+        });
+
         spinner.setPreferredSize(new Dimension(100, 20));
         label = new JLabel(LABEL_SPINNER_INCREASE_OR_DECREASE_DEATH);
 
@@ -84,10 +97,6 @@ public class OptionsSelectionGUI {
         return (int) spinner.getValue();
     }
 
-    public void changeSpinnerModel(SpinnerModel model) {
-        spinner.setModel(model);
-    }
-
     public JPanel getPanel() {
         return this.optionPanel;
     }
@@ -107,17 +116,28 @@ public class OptionsSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            int numberOfDeathInSaveFile = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(-numberOfDeathInSaveFile, -numberOfDeathInSaveFile, Integer.MAX_VALUE - numberOfDeathInSaveFile, 1);
+            saveFileInformation.setCharacter(fromSoftwareCharacter);
+            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
+            SpinnerModel model = new SpinnerNumberModel(-currentNumberOfDeath, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
             spinner.setModel(model);
+            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
         } catch (NullPointerException exception) {
-            saveFileInformation.setStringifiedData("Solution pas encore développée pour : " + saveFileInformation.getChosenGame().getFullName());
+            displayError(exception.getMessage());
         }
     }
 
-
     private void reinitializeSpinner() {
-        spinner.setValue(0);
+        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
+        try {
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
+            saveFileInformation.setCharacter(fromSoftwareCharacter);
+            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
+            SpinnerModel model = new SpinnerNumberModel(0, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
+            spinner.setModel(model);
+            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
+        } catch (NullPointerException exception) {
+            displayError(exception.getMessage());
+        }
     }
 
     private static void displayError(String errorMessage) {
@@ -125,4 +145,8 @@ public class OptionsSelectionGUI {
         errorDialog.setVisible(true);
     }
 
+    public void setEnabled(boolean isEnabled) {
+        asList(optionPanel.getComponents())
+                .forEach(component -> component.setEnabled(isEnabled));
+    }
 }

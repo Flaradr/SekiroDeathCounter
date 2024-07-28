@@ -42,8 +42,8 @@ public class GameInformationGUI {
     }
 
     protected void updateInformations() {
-        if (null != saveFileInformation && null != saveFileInformation.getStringifiedData()) {
-            gameInformationLabel.setText(saveFileInformation.getStringifiedData());
+        if (null != saveFileInformation && null != saveFileInformation.getCharacter()) {
+            gameInformationLabel.setText(saveFileInformation.getCharacter().toHtmlString());
         }
     }
 }
