@@ -12,9 +12,9 @@ public class GameInformationGUI {
     public static final String SAVE_FILE_INFORMATIONS = "Informations sur la sauvegarde";
     public static final String No_INFORMATION_AVAILABLE = "Aucune information disponible";
 
-    private SaveFileInformation saveFileInformation;
+    private final SaveFileInformation saveFileInformation;
     private JPanel informationPanel;
-    private JLabel gameInformationLabel;
+    private final JLabel gameInformationLabel;
 
     public GameInformationGUI(SaveFileInformation mySaveFileInformation) {
         gameInformationLabel = new JLabel(No_INFORMATION_AVAILABLE);

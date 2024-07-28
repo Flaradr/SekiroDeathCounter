@@ -40,7 +40,7 @@ public class ParameterSelectionGUI {
     ScheduledFuture future;
     PausableSwingWorker worker;
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
 
     public ParameterSelectionGUI(SaveFileInformation mySaveFileInformation) {

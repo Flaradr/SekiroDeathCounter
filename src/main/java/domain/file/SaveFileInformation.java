@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class SaveFileInformation {
 
-    private Set<PropertyChangeListener> listeners;
+    private final Set<PropertyChangeListener> listeners;
 
     private Path saveFilePath;
     private FromSoftwareGames chosenGame;

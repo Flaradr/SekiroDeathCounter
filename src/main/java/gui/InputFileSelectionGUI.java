@@ -18,9 +18,9 @@ public class InputFileSelectionGUI {
 
     private JPanel inputFileSelectionPanel;
     private JButton uploadButton;
-    private JLabel chosenGameLabel;
+    private final JLabel chosenGameLabel;
 
-    private SaveFileInformation saveFileInformation;
+    private final SaveFileInformation saveFileInformation;
 
     public InputFileSelectionGUI(SaveFileInformation saveFileInformation) {
         this.saveFileInformation = saveFileInformation;

@@ -10,7 +10,6 @@ import java.awt.*;
 public class GameSelectionGUI {
     public static final String GAME_LIST_TITLE = "Liste des jeux";
     private JPanel gameSelectionPanel;
-    private FromSoftwareGames chosenGame;
 
 
     public GameSelectionGUI(SaveFileInformation mySaveFileInformation) {
@@ -26,7 +25,6 @@ public class GameSelectionGUI {
         for (FromSoftwareGames game : FromSoftwareGames.values()) {
             AbstractButton jButton = new JRadioButton(game.getFullName());
             jButton.addActionListener(actionListener -> {
-                chosenGame = game;
                 mySaveFileInformation.setChosenGame(game);
             });
             gameSelectionPanel.add(jButton);
