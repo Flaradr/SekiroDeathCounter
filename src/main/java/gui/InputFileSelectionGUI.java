@@ -7,6 +7,8 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class InputFileSelectionGUI {
     private final static String INPUT_FILE_NOT_LOADED = "Pas de fichier chargé";
@@ -15,6 +17,8 @@ public class InputFileSelectionGUI {
     public static final String CHOOSE_SAVE_FILE = "Choisir un fichier de sauvegarde";
     public static final String LOADED_FILE_COLON = "Fichier chargé : ";
     public static final String SELECTED_FILE_IS_NOT_A_SAVE_FILE = "Le fichier choisi n'est pas un fichier de sauvegarde";
+
+    private static Logger logger = LogManager.getLogger(InputFileSelectionGUI.class);
 
     private JPanel inputFileSelectionPanel;
     private JButton uploadButton;
@@ -76,6 +80,7 @@ public class InputFileSelectionGUI {
 
 
     private static void displayError(String errorMessage) {
+        logger.warn(errorMessage);
         ErrorDialog errorDialog = new ErrorDialog(errorMessage);
         errorDialog.setVisible(true);
     }

@@ -1,5 +1,8 @@
 package gui;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -7,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class OutputFileSelectionGUI {
+    private static Logger logger = LogManager.getLogger(OutputFileSelectionGUI.class);
 
     private final static String OUTPUT_FILE_NOT_DEFINED = "Pas de fichier de sortie défini";
     public static final String OUTPUT_FILE_BORDER_TITLE = "Informations sur le fichier en sortie";
@@ -75,6 +79,7 @@ public class OutputFileSelectionGUI {
     }
 
     private static void displayError(String errorMessage) {
+        logger.warn(errorMessage);
         ErrorDialog errorDialog = new ErrorDialog(errorMessage);
         errorDialog.setVisible(true);
     }

@@ -3,6 +3,8 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -21,7 +23,7 @@ public class OptionsSelectionGUI {
     public static final String SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH = "Le minimum est le nombre de mort existant dans le fichier de sauvegarde";
     public static final String GAME_NOT_SELECTED = "Le jeu n'a pas été sélectionné";
     public static final String SAVE_FILE_NOT_SELECTED = "Le fichier de sauvegarde n'a pas été choisi";
-
+    private static Logger logger = LogManager.getLogger(OptionsSelectionGUI.class);
     private final JPanel optionPanel;
     private JButton resetDeathCounterToZeroButton;
     private JButton resetSpinnerDefaultValueButton;
@@ -141,6 +143,7 @@ public class OptionsSelectionGUI {
     }
 
     private static void displayError(String errorMessage) {
+        logger.warn(errorMessage);
         ErrorDialog errorDialog = new ErrorDialog(errorMessage);
         errorDialog.setVisible(true);
     }

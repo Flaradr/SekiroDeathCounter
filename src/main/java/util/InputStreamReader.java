@@ -1,11 +1,16 @@
 package util;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class InputStreamReader {
+
+    private static Logger logger = LogManager.getLogger(InputStreamReader.class);
 
     /**
      * Read every byte of a file.
@@ -18,7 +23,7 @@ public class InputStreamReader {
                 System.out.println((inputStream.read()));
             }
         } catch (IOException ex) {
-            System.out.println("Error while reading the file {}" + filePath + " - " + ex);
+            logger.error("Error while reading the file {} - {}", filePath, ex);
         }
     }
 
@@ -33,7 +38,7 @@ public class InputStreamReader {
         try (InputStream inputStream = new FileInputStream(filePath)) {
             bytes = inputStream.readNBytes(bytesToRead);
         } catch (IOException ex) {
-            System.out.println("Error while reading the file {}" + filePath + " - " + ex);
+            logger.error("Error while reading the file {} - {}", filePath, ex);
         }
         return bytes;
     }
@@ -55,7 +60,7 @@ public class InputStreamReader {
                 throw new IOException("Number of bytes skipped is inferior to the offset");
             }
         } catch (IOException ex) {
-            System.out.println("Error while reading the file {}" + filePath + " - " + ex);
+            logger.error("Error while reading the file {} - {}", filePath, ex);
         }
         return bytes;
     }

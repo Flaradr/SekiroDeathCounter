@@ -3,6 +3,8 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import util.FileWriterWrapper;
 
 import javax.swing.*;
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ParameterSelectionGUI {
-
+    private static Logger logger = LogManager.getLogger(ParameterSelectionGUI.class);
     private final static int PERIOD_BETWEEN_READING_IN_SECONDS = 5;
     public static final String PARAMETERS = "Paramètres";
     public static final String START_PROGRAM = "Démarrer le compteur";
@@ -147,6 +149,7 @@ public class ParameterSelectionGUI {
     }
 
     private static void displayError(String errorMessage) {
+        logger.warn(errorMessage);
         ErrorDialog errorDialog = new ErrorDialog(errorMessage);
         errorDialog.setVisible(true);
     }
