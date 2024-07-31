@@ -1,5 +1,6 @@
 package gui;
 
+import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,6 +9,8 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import static gui.dialog.Dialog.displayMessage;
 
 public class OutputFileSelectionGUI {
     private static Logger logger = LogManager.getLogger(OutputFileSelectionGUI.class);
@@ -46,7 +49,8 @@ public class OutputFileSelectionGUI {
             if (fileChooser.showOpenDialog(fileOutputSelectionButton) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 if (isASaveFile(fileToSave.getAbsolutePath())) {
-                    displayError("Vous avez sélectionner un fichier de sauvegarde comme fichier où sera sauvegarder le compteur de mort !");
+                    displayMessage(DialogType.WARNING, "Vous avez sélectionné un fichier de sauvegarde comme fichier où sera sauvegarder le compteur de mort ! " +
+                            "Veuillez choisir un autre fichier");
                 } else {
                     numberOfDeathFilePath = Path.of(fileToSave.getAbsolutePath());
                     outputFileLabel.setText(numberOfDeathFilePath.toString());
@@ -76,12 +80,6 @@ public class OutputFileSelectionGUI {
 
     public Path getNumberOfDeathFilePath() {
         return this.numberOfDeathFilePath;
-    }
-
-    private static void displayError(String errorMessage) {
-        logger.warn(errorMessage);
-        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
-        errorDialog.setVisible(true);
     }
 
 }

@@ -1,9 +1,9 @@
 import domain.file.SaveFileInformation;
 import gui.DeathCounterGUI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 public class Application {
 
@@ -21,6 +21,6 @@ public class Application {
     }
 
     private static void handleException(Throwable e) {
-        logger.error(e);
+        logger.error("Runtime exception", e);
     }
 }

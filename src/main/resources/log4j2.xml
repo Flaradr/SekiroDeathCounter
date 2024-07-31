@@ -7,7 +7,7 @@
 
         <RollingFile name="RollingRandomAccessFile" fileName="logs/app.log"
                      filePattern="logs/%d{yyyy-MM-dd}_app.log.zip">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %logger{36} - %message %n"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="32 MB"/>
             </Policies>

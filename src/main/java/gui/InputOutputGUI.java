@@ -21,7 +21,6 @@ public class InputOutputGUI {
         gameUploadPanel.add(parameterSelectionGUI.getParameterSelectionPanel(), BorderLayout.CENTER);
     }
 
-
     public JPanel getGameUploadPanel() {
         return gameUploadPanel;
     }

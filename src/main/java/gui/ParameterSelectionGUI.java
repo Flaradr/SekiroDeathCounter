@@ -3,6 +3,7 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
+import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.FileWriterWrapper;
@@ -14,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import static gui.dialog.Dialog.displayMessage;
 
 
 public class ParameterSelectionGUI {
@@ -92,7 +95,7 @@ public class ParameterSelectionGUI {
                 writeInSelectedFile(numberOfDeathWithOffset);
             }
         } catch (NullPointerException exception) {
-            displayError(exception.getMessage());
+            logger.error(exception);
         }
     }
 
@@ -116,12 +119,12 @@ public class ParameterSelectionGUI {
 
     private void onPressStartButton() {
         if (null == charSaveFileInformation.getChosenGame()) {
-            displayError(GAME_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, GAME_NOT_SELECTED);
             return;
         }
 
         if (null == charSaveFileInformation.getSaveFilePath()) {
-            displayError(SAVE_FILE_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, SAVE_FILE_NOT_SELECTED);
             return;
         }
 
@@ -146,12 +149,6 @@ public class ParameterSelectionGUI {
                 worker.resume();
             }
         }
-    }
-
-    private static void displayError(String errorMessage) {
-        logger.warn(errorMessage);
-        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
-        errorDialog.setVisible(true);
     }
 
     public void handleDeathCounter() {

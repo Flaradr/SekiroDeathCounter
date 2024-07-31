@@ -1,14 +1,17 @@
 package gui;
 
 import domain.file.SaveFileInformation;
+import gui.dialog.DialogType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+
+import static gui.dialog.Dialog.displayMessage;
 
 public class InputFileSelectionGUI {
     private final static String INPUT_FILE_NOT_LOADED = "Pas de fichier chargé";
@@ -16,7 +19,8 @@ public class InputFileSelectionGUI {
     public static final String INPUT_FILE_BORDER_TITLE = "Fichier de sauvegarde";
     public static final String CHOOSE_SAVE_FILE = "Choisir un fichier de sauvegarde";
     public static final String LOADED_FILE_COLON = "Fichier chargé : ";
-    public static final String SELECTED_FILE_IS_NOT_A_SAVE_FILE = "Le fichier choisi n'est pas un fichier de sauvegarde";
+    public static final String SELECTED_FILE_IS_NOT_A_SAVE_FILE = "Le fichier choisi n'est pas un fichier de sauvegarde." +
+            "Veuillez choisir un autre fichier";
 
     private static Logger logger = LogManager.getLogger(InputFileSelectionGUI.class);
 
@@ -51,7 +55,7 @@ public class InputFileSelectionGUI {
             if (fileChooser.showOpenDialog(uploadButton) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 if (!isASaveFile(selectedFile.getAbsolutePath())) {
-                    displayError(SELECTED_FILE_IS_NOT_A_SAVE_FILE);
+                    displayMessage(DialogType.WARNING, SELECTED_FILE_IS_NOT_A_SAVE_FILE);
                 } else {
                     this.saveFileInformation.setSaveFilePath(Path.of(selectedFile.getAbsolutePath()));
                     chosenGameLabel.setText(LOADED_FILE_COLON + saveFileInformation.getSaveFilePath().getFileName().toString());
@@ -78,10 +82,4 @@ public class InputFileSelectionGUI {
                 .orElse(false);
     }
 
-
-    private static void displayError(String errorMessage) {
-        logger.warn(errorMessage);
-        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
-        errorDialog.setVisible(true);
-    }
 }

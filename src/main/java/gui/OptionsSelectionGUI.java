@@ -3,6 +3,7 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
+import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static gui.dialog.Dialog.displayMessage;
 import static java.util.Arrays.asList;
 
 public class OptionsSelectionGUI {
@@ -106,12 +108,12 @@ public class OptionsSelectionGUI {
 
     private void setDeathCounterToZero() {
         if (null == saveFileInformation.getChosenGame()) {
-            displayError(GAME_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, GAME_NOT_SELECTED);
             return;
         }
 
         if (null == saveFileInformation.getSaveFilePath()) {
-            displayError(SAVE_FILE_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, SAVE_FILE_NOT_SELECTED);
             return;
         }
 
@@ -124,7 +126,7 @@ public class OptionsSelectionGUI {
             spinner.setModel(model);
             saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
         } catch (NullPointerException exception) {
-            displayError(exception.getMessage());
+            logger.error("Error while setting death counter to 0", exception);
         }
     }
 
@@ -138,14 +140,8 @@ public class OptionsSelectionGUI {
             spinner.setModel(model);
             saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
         } catch (NullPointerException exception) {
-            displayError(exception.getMessage());
+            logger.error("Error while setting the spinner to 0", exception);
         }
-    }
-
-    private static void displayError(String errorMessage) {
-        logger.warn(errorMessage);
-        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
-        errorDialog.setVisible(true);
     }
 
     public void setEnabled(boolean isEnabled) {
