@@ -133,20 +133,20 @@ public class ParameterSelectionGUI {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
-                optionsSelectionGUI.setEnabled(false);
                 worker.execute();
+                optionsSelectionGUI.setEnabled(false);
             }
             case RUNNING -> {
                 deathCounterStatus = ProgramStatus.PAUSED;
                 startButton.setText(RESUME_PROGRAM);
-                optionsSelectionGUI.setEnabled(true);
                 worker.pause();
+                optionsSelectionGUI.setEnabled(true);
             }
             case PAUSED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
-                optionsSelectionGUI.setEnabled(false);
                 worker.resume();
+                optionsSelectionGUI.setEnabled(false);
             }
         }
     }
