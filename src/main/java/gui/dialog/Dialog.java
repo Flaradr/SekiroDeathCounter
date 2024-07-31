@@ -1,4 +1,4 @@
-package gui;
+package gui.dialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,26 +7,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
 
-public class ErrorDialog extends JDialog {
+public abstract class Dialog extends JDialog {
 
     public static final String ESCAPE_KEY_NAME = "ESCAPE";
     public static final String CLOSE_BUTTON_LABEL = "Fermer";
-    public static final String ERROR_MODAL_LABEL = "Erreur";
     public static final int MARGIN_SIZE = 30;
     public static final int PANEL_WIDTH = 480;
     public static final int PANEL_HEIGHT = 150;
     private final JPanel centerPanel;
     private final JPanel bottomPanel;
 
-    private final JLabel errorLabel;
+    private final JLabel message;
     private final JButton buttonClose;
 
-    public ErrorDialog(String errorMessage) {
-        this(errorMessage, null);
-    }
-
-    public ErrorDialog(String errorMessage, Throwable exception) {
-        setTitle(ERROR_MODAL_LABEL);
+    public Dialog(){
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setResizable(true);
@@ -34,9 +28,9 @@ public class ErrorDialog extends JDialog {
         setSize(PANEL_WIDTH, PANEL_HEIGHT);
 
         centerPanel = new JPanel();
-        errorLabel = new JLabel(String.format("<html><div WIDTH=%d>%s</div></html>", this.getWidth() - MARGIN_SIZE, errorMessage));
+        message = new JLabel("");
 
-        centerPanel.add(errorLabel);
+        centerPanel.add(message);
 
 
         bottomPanel = new JPanel();
@@ -57,6 +51,10 @@ public class ErrorDialog extends JDialog {
         centerDialogOnTheScreen();
     }
 
+    public Dialog(String message){
+        this();
+        this.message.setText(String.format("<html><div WIDTH=%d>%s</div></html>", this.getWidth() - MARGIN_SIZE, message));
+    }
 
     /**
      * Make the [Escape] key to behave like the [Close] button.
@@ -82,5 +80,12 @@ public class ErrorDialog extends JDialog {
         int centerPosX = (screenSize.width - dialogSize.width) / 2;
         int centerPosY = (screenSize.height - dialogSize.height) / 2;
         setLocation(centerPosX, centerPosY);
+    }
+
+    public static void displayMessage(DialogType dialogType, String message){
+        switch (dialogType){
+            case WARNING -> new WarningDialog(message);
+            case ERROR -> new ErrorDialog(message);
+        }
     }
 }

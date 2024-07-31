@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" name="baeldung" packages="">
+    <Appenders>
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p %m%n"/>
+        </Console>
+
+        <RollingFile name="RollingRandomAccessFile" fileName="logs/app.log"
+                     filePattern="logs/%d{yyyy-MM-dd}_app.log.zip">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %logger{36} - %message %n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="32 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="RollingRandomAccessFile"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

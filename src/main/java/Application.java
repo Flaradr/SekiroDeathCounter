@@ -1,11 +1,14 @@
 import domain.file.SaveFileInformation;
 import gui.DeathCounterGUI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 
 public class Application {
 
     private static JFrame gui;
+    private static Logger logger = LogManager.getLogger(Application.class);
 
     public static void main(String[] args) {
         setupGlobalExceptionHandling();
@@ -14,16 +17,10 @@ public class Application {
     }
 
     public static void setupGlobalExceptionHandling() {
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                handleException(e);
-            }
-        });
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> handleException(e));
     }
 
     private static void handleException(Throwable e) {
-        JOptionPane.showMessageDialog(gui, e.getMessage());
+        logger.error("Runtime exception", e);
     }
-
 }

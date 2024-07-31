@@ -3,6 +3,9 @@ package gui;
 import controller.FileReaderController;
 import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
+import gui.dialog.DialogType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -11,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static gui.dialog.Dialog.displayMessage;
 import static java.util.Arrays.asList;
 
 public class OptionsSelectionGUI {
@@ -21,7 +25,7 @@ public class OptionsSelectionGUI {
     public static final String SPINNER_TOOLTIP_INCREASE_OR_DECREASE_NUMBER_OF_DEATH = "Le minimum est le nombre de mort existant dans le fichier de sauvegarde";
     public static final String GAME_NOT_SELECTED = "Le jeu n'a pas été sélectionné";
     public static final String SAVE_FILE_NOT_SELECTED = "Le fichier de sauvegarde n'a pas été choisi";
-
+    private static Logger logger = LogManager.getLogger(OptionsSelectionGUI.class);
     private final JPanel optionPanel;
     private JButton resetDeathCounterToZeroButton;
     private JButton resetSpinnerDefaultValueButton;
@@ -104,12 +108,12 @@ public class OptionsSelectionGUI {
 
     private void setDeathCounterToZero() {
         if (null == saveFileInformation.getChosenGame()) {
-            displayError(GAME_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, GAME_NOT_SELECTED);
             return;
         }
 
         if (null == saveFileInformation.getSaveFilePath()) {
-            displayError(SAVE_FILE_NOT_SELECTED);
+            displayMessage(DialogType.WARNING, SAVE_FILE_NOT_SELECTED);
             return;
         }
 
@@ -122,7 +126,7 @@ public class OptionsSelectionGUI {
             spinner.setModel(model);
             saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
         } catch (NullPointerException exception) {
-            displayError(exception.getMessage());
+            logger.error("Error while setting death counter to 0", exception);
         }
     }
 
@@ -136,13 +140,8 @@ public class OptionsSelectionGUI {
             spinner.setModel(model);
             saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
         } catch (NullPointerException exception) {
-            displayError(exception.getMessage());
+            logger.error("Error while setting the spinner to 0", exception);
         }
-    }
-
-    private static void displayError(String errorMessage) {
-        ErrorDialog errorDialog = new ErrorDialog(errorMessage);
-        errorDialog.setVisible(true);
     }
 
     public void setEnabled(boolean isEnabled) {
