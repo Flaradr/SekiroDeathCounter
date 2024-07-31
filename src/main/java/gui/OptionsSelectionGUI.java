@@ -1,9 +1,6 @@
 package gui;
 
-import controller.FileReaderController;
-import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
-import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,9 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static domain.file.SaveFileInformation.CHOSEN_GAME_FIELD_NAME;
-import static domain.file.SaveFileInformation.SAVE_FILE_PATH_FIELD_NAME;
-import static gui.dialog.Dialog.displayMessage;
+import static domain.file.SaveFileInformation.*;
 import static java.util.Arrays.asList;
 
 public class OptionsSelectionGUI {
@@ -50,6 +45,8 @@ public class OptionsSelectionGUI {
                     } else {
                         disableComponents();
                     }
+                } else if (evt.getPropertyName().equals(CHARACTER_FIELD_NAME)) {
+                    currentNumberOfDeath = saveFileInformation.getNumberOfDeath();
                 }
             }
         });
@@ -127,41 +124,15 @@ public class OptionsSelectionGUI {
 
 
     private void setDeathCounterToZero() {
-        if (null == saveFileInformation.getChosenGame()) {
-            displayMessage(DialogType.WARNING, GAME_NOT_SELECTED);
-            return;
-        }
-
-        if (null == saveFileInformation.getSaveFilePath()) {
-            displayMessage(DialogType.WARNING, SAVE_FILE_NOT_SELECTED);
-            return;
-        }
-
-        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
-        try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            saveFileInformation.setCharacter(fromSoftwareCharacter);
-            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(-currentNumberOfDeath, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
-            spinner.setModel(model);
-            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
-        } catch (NullPointerException exception) {
-            logger.error("Error while setting death counter to 0", exception);
-        }
+        SpinnerModel model = new SpinnerNumberModel(-currentNumberOfDeath, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
+        spinner.setModel(model);
+        saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
     }
 
     private void reinitializeSpinner() {
-        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
-        try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            saveFileInformation.setCharacter(fromSoftwareCharacter);
-            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(0, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
-            spinner.setModel(model);
-            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
-        } catch (NullPointerException exception) {
-            logger.error("Error while setting the spinner to 0", exception);
-        }
+        SpinnerModel model = new SpinnerNumberModel(0, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
+        spinner.setModel(model);
+        saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
     }
 
     public void setEnabled(boolean enabled) {

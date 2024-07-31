@@ -1,5 +1,7 @@
 package gui;
 
+import controller.FileReaderController;
+import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
 import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
@@ -7,10 +9,14 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static domain.file.SaveFileInformation.CHOSEN_GAME_FIELD_NAME;
+import static domain.file.SaveFileInformation.SAVE_FILE_PATH_FIELD_NAME;
 import static gui.dialog.Dialog.displayMessage;
 
 public class InputFileSelectionGUI {
@@ -32,6 +38,16 @@ public class InputFileSelectionGUI {
 
     public InputFileSelectionGUI(SaveFileInformation saveFileInformation) {
         this.saveFileInformation = saveFileInformation;
+        saveFileInformation.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if(evt.getPropertyName().equals(CHOSEN_GAME_FIELD_NAME) || evt.getPropertyName().equals(SAVE_FILE_PATH_FIELD_NAME)){
+                    readFile();
+                }
+            }
+        });
+
+
         chosenGameLabel = new JLabel(INPUT_FILE_NOT_LOADED);
         initComponents();
     }
@@ -82,4 +98,18 @@ public class InputFileSelectionGUI {
                 .orElse(false);
     }
 
+    public void readFile() {
+        if (null == this.saveFileInformation.getChosenGame() ||
+                (null == this.saveFileInformation.getSaveFilePath())) {
+            return;
+        }
+
+        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
+        try {
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
+            saveFileInformation.setCharacter(fromSoftwareCharacter);
+        } catch (NullPointerException exception) {
+            logger.error("Error while setting the spinner to 0", exception);
+        }
+    }
 }
