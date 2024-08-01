@@ -88,7 +88,15 @@ public class ParameterSelectionGUI {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
             FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.getCharacterById(charSaveFileInformation.getSlotIndex());
-            if (!fromSoftwareCharacter.equals(charSaveFileInformation.getCharacter())) {
+            if (fromSoftwareCharacter.getName().equals(charSaveFileInformation.getCharacter().getName()) &&
+                    fromSoftwareCharacter.getLevel() == charSaveFileInformation.getCharacter().getLevel()) {
+                if (Math.abs(fromSoftwareCharacter.getDeathCount() - charSaveFileInformation.getNumberOfDeath()) <= 1) {
+                    charSaveFileInformation.setCharacter(fromSoftwareCharacter);
+                    int numberOfDeathWithOffset = computeDeathWithOffset();
+                    charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
+                    writeInSelectedFile(numberOfDeathWithOffset);
+                }
+            } else {
                 charSaveFileInformation.setCharacter(fromSoftwareCharacter);
                 int numberOfDeathWithOffset = computeDeathWithOffset();
                 charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
