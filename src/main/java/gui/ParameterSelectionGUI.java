@@ -87,7 +87,7 @@ public class ParameterSelectionGUI {
     private void updateGameInfo() {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.getCharacterById(charSaveFileInformation.getSlotIndex());
             if (!fromSoftwareCharacter.equals(charSaveFileInformation.getCharacter())) {
                 charSaveFileInformation.setCharacter(fromSoftwareCharacter);
                 int numberOfDeathWithOffset = computeDeathWithOffset();

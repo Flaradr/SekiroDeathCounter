@@ -9,6 +9,7 @@ import service.FromSoftwareService;
 import service.SekiroService;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class FileReaderController {
 
@@ -22,7 +23,15 @@ public class FileReaderController {
 
     }
 
-    public FromSoftwareCharacter get(int slotIndex) {
+    public FromSoftwareCharacter getCharacterById(int slotIndex) {
         return service.getCharacterById(slotIndex);
+    }
+
+    public List<? extends FromSoftwareCharacter> getAll() {
+        return service.getAllCharacters();
+    }
+
+    public List<String> getAllCharactersNames() {
+        return service.getAllNames();
     }
 }
