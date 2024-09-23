@@ -87,8 +87,16 @@ public class ParameterSelectionGUI {
     private void updateGameInfo() {
         FileReaderController fileReaderController = new FileReaderController(charSaveFileInformation.getChosenGame(), this.charSaveFileInformation.getSaveFilePath());
         try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            if (!fromSoftwareCharacter.equals(charSaveFileInformation.getCharacter())) {
+            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.getCharacterById(charSaveFileInformation.getSlotIndex());
+            if (fromSoftwareCharacter.getName().equals(charSaveFileInformation.getCharacter().getName()) &&
+                    fromSoftwareCharacter.getLevel() == charSaveFileInformation.getCharacter().getLevel()) {
+                if (Math.abs(fromSoftwareCharacter.getDeathCount() - charSaveFileInformation.getNumberOfDeath()) <= 1) {
+                    charSaveFileInformation.setCharacter(fromSoftwareCharacter);
+                    int numberOfDeathWithOffset = computeDeathWithOffset();
+                    charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
+                    writeInSelectedFile(numberOfDeathWithOffset);
+                }
+            } else {
                 charSaveFileInformation.setCharacter(fromSoftwareCharacter);
                 int numberOfDeathWithOffset = computeDeathWithOffset();
                 charSaveFileInformation.updateNumberOfDeath(numberOfDeathWithOffset);
@@ -133,20 +141,20 @@ public class ParameterSelectionGUI {
             case STOPPED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
-                optionsSelectionGUI.setEnabled(false);
                 worker.execute();
+                optionsSelectionGUI.setEnabled(false);
             }
             case RUNNING -> {
                 deathCounterStatus = ProgramStatus.PAUSED;
                 startButton.setText(RESUME_PROGRAM);
-                optionsSelectionGUI.setEnabled(true);
                 worker.pause();
+                optionsSelectionGUI.setEnabled(true);
             }
             case PAUSED -> {
                 deathCounterStatus = ProgramStatus.RUNNING;
                 startButton.setText(PAUSE_PROGRAM);
-                optionsSelectionGUI.setEnabled(false);
                 worker.resume();
+                optionsSelectionGUI.setEnabled(false);
             }
         }
     }

@@ -1,9 +1,6 @@
 package gui;
 
-import controller.FileReaderController;
-import domain.character.FromSoftwareCharacter;
 import domain.file.SaveFileInformation;
-import gui.dialog.DialogType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,8 +10,10 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import static gui.dialog.Dialog.displayMessage;
+import static domain.file.SaveFileInformation.*;
 import static java.util.Arrays.asList;
 
 public class OptionsSelectionGUI {
@@ -33,9 +32,26 @@ public class OptionsSelectionGUI {
     private final JSpinner spinner;
     private final SaveFileInformation saveFileInformation;
     private int currentNumberOfDeath;
+    private boolean canBeEnabled;
 
     public OptionsSelectionGUI(SaveFileInformation saveFileInformation) {
         this.saveFileInformation = saveFileInformation;
+        saveFileInformation.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(SAVE_FILE_PATH_FIELD_NAME) || evt.getPropertyName().equals(CHOSEN_GAME_FIELD_NAME)) {
+                    if (canOptionsBeUsed()) {
+                        enableComponents();
+                    } else {
+                        disableComponents();
+                    }
+                } else if (evt.getPropertyName().equals(CHARACTER_FIELD_NAME)) {
+                    currentNumberOfDeath = saveFileInformation.getNumberOfDeath();
+                }
+            }
+        });
+
+        this.canBeEnabled = true;
         optionPanel = new JPanel();
         spinner = new JSpinner();
 
@@ -95,6 +111,7 @@ public class OptionsSelectionGUI {
         gbc.gridx = 0;
         gbc.insets = new Insets(0, 10, 0, 0);
         optionPanel.add(resetDeathCounterToZeroButton, gbc);
+        disableComponents();
     }
 
     public int getOffsetValue() {
@@ -107,45 +124,43 @@ public class OptionsSelectionGUI {
 
 
     private void setDeathCounterToZero() {
-        if (null == saveFileInformation.getChosenGame()) {
-            displayMessage(DialogType.WARNING, GAME_NOT_SELECTED);
-            return;
-        }
-
-        if (null == saveFileInformation.getSaveFilePath()) {
-            displayMessage(DialogType.WARNING, SAVE_FILE_NOT_SELECTED);
-            return;
-        }
-
-        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
-        try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            saveFileInformation.setCharacter(fromSoftwareCharacter);
-            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(-currentNumberOfDeath, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
-            spinner.setModel(model);
-            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
-        } catch (NullPointerException exception) {
-            logger.error("Error while setting death counter to 0", exception);
-        }
+        SpinnerModel model = new SpinnerNumberModel(-currentNumberOfDeath, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
+        spinner.setModel(model);
+        saveFileInformation.updateNumberOfDeath(currentNumberOfDeath + (int) spinner.getValue());
     }
 
     private void reinitializeSpinner() {
-        FileReaderController fileReaderController = new FileReaderController(saveFileInformation.getChosenGame(), saveFileInformation.getSaveFilePath());
-        try {
-            FromSoftwareCharacter fromSoftwareCharacter = fileReaderController.get(0);
-            saveFileInformation.setCharacter(fromSoftwareCharacter);
-            currentNumberOfDeath = fromSoftwareCharacter.getDeathCount();
-            SpinnerModel model = new SpinnerNumberModel(0, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
-            spinner.setModel(model);
-            saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
-        } catch (NullPointerException exception) {
-            logger.error("Error while setting the spinner to 0", exception);
-        }
+        SpinnerModel model = new SpinnerNumberModel(0, -currentNumberOfDeath, Integer.MAX_VALUE - currentNumberOfDeath, 1);
+        spinner.setModel(model);
+        saveFileInformation.updateNumberOfDeath(currentNumberOfDeath);
     }
 
-    public void setEnabled(boolean isEnabled) {
+    public void setEnabled(boolean enabled) {
+        this.canBeEnabled = enabled;
         asList(optionPanel.getComponents())
-                .forEach(component -> component.setEnabled(isEnabled));
+                .forEach(component -> component.setEnabled(enabled));
+    }
+
+    private void enableComponents() {
+        asList(optionPanel.getComponents())
+                .forEach(component -> component.setEnabled(true));
+    }
+
+
+    private void disableComponents() {
+        asList(optionPanel.getComponents())
+                .forEach(component -> component.setEnabled(false));
+    }
+
+    /**
+     * Check if the game and the save as been selected to use options.
+     *
+     * @return True if flagged as allowed to be enabled and if the game and save file have been chosen.
+     * False otherwise.
+     */
+    private boolean canOptionsBeUsed() {
+        return !(null == this.saveFileInformation.getChosenGame()) &&
+                !(null == this.saveFileInformation.getSaveFilePath()) &&
+                canBeEnabled;
     }
 }
