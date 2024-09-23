@@ -3,7 +3,6 @@ package gui.dialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
 
@@ -20,7 +19,7 @@ public abstract class Dialog extends JDialog {
     private final JLabel message;
     private final JButton buttonClose;
 
-    public Dialog(){
+    protected Dialog() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setResizable(true);
@@ -37,12 +36,7 @@ public abstract class Dialog extends JDialog {
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, MARGIN_SIZE, 15));
         buttonClose = new JButton();
         buttonClose.setText(CLOSE_BUTTON_LABEL);
-        buttonClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        buttonClose.addActionListener((ActionEvent e) -> dispose());
         bottomPanel.add(buttonClose);
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -51,7 +45,7 @@ public abstract class Dialog extends JDialog {
         centerDialogOnTheScreen();
     }
 
-    public Dialog(String message){
+    protected Dialog(String message) {
         this();
         this.message.setText(String.format("<html><div WIDTH=%d>%s</div></html>", this.getWidth() - MARGIN_SIZE, message));
     }
@@ -82,10 +76,11 @@ public abstract class Dialog extends JDialog {
         setLocation(centerPosX, centerPosY);
     }
 
-    public static void displayMessage(DialogType dialogType, String message){
-        switch (dialogType){
+    public static void displayMessage(DialogType dialogType, String message) {
+        switch (dialogType) {
             case WARNING -> new WarningDialog(message);
             case ERROR -> new ErrorDialog(message);
+            case INFO -> new InfoDialog(message);
         }
     }
 }

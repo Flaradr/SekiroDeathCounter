@@ -3,17 +3,14 @@ import gui.DeathCounterGUI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
-
 public class Application {
 
-    private static JFrame gui;
     private static Logger logger = LogManager.getLogger(Application.class);
 
     public static void main(String[] args) {
         setupGlobalExceptionHandling();
         SaveFileInformation mySaveFileInformation = new SaveFileInformation();
-        gui = new DeathCounterGUI(mySaveFileInformation);
+        new DeathCounterGUI(mySaveFileInformation);
     }
 
     public static void setupGlobalExceptionHandling() {
